@@ -1,5 +1,7 @@
 #include <string>
 #include <iostream>
+#include <vector>
+#include <cstdint>
 
 #include <QtWidgets>
 #include <QtWidgets/QApplication>

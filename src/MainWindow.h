@@ -16,6 +16,12 @@ namespace CellVision
 
 		static Log& getLog();
 
+	private slots:
+
+		void on_pushButtonBrowseImageFilePath_clicked();
+		void on_pushButtonLoad_clicked();
+		void on_horizontalSliderZDepth_valueChanged();
+
 	private:
 
 		Ui::MainWindowClass ui;
