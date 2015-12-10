@@ -1,18 +1,24 @@
 #pragma once
 
-#include <QtWidgets/QMainWindow>
 #include "ui_MainWindow.h"
 
-class MainWindow : public QMainWindow
+namespace CellVision
 {
-	Q_OBJECT
+	class Log;
 
-public:
+	class MainWindow : public QMainWindow
+	{
+		Q_OBJECT
 
-	MainWindow(QWidget *parent = 0);
-	~MainWindow();
+	public:
 
-private:
+		explicit MainWindow(QWidget* parent = nullptr);
+		~MainWindow();
 
-	Ui::MainWindowClass ui;
-};
+		static Log& getLog();
+
+	private:
+
+		Ui::MainWindowClass ui;
+	};
+}
