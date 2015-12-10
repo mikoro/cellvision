@@ -14,6 +14,14 @@ int main(int argc, char *argv[])
 	Log& log = mainWindow.getLog();
 	log.logInfo("CellVision v%s", CELLVISION_VERSION);
 
+	QSurfaceFormat format;
+	format.setDepthBufferSize(24);
+	format.setStencilBufferSize(8);
+	//format.setSamples(4);
+	format.setVersion(3, 2);
+	format.setProfile(QSurfaceFormat::CoreProfile);
+	QSurfaceFormat::setDefaultFormat(format);
+
 	try
 	{
 		mainWindow.show();
