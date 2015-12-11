@@ -3,6 +3,7 @@
 #include <vector>
 #include <cstdint>
 
+#include <QtCore>
 #include <QtWidgets>
 #include <QtWidgets/QApplication>
 

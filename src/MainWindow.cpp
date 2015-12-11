@@ -12,6 +12,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 
 	resize(1280, 800);
 	ui.splitterMain->setSizes({ 500, 10 });
+
+	ui.renderWidget->setUI(&ui);
 }
 
 Log& MainWindow::getLog()

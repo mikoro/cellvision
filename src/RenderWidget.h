@@ -3,6 +3,11 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_2_Core>
 
+namespace Ui
+{
+	class MainWindowClass;
+}
+
 namespace CellVision
 {
 	class RenderWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_2_Core
@@ -12,6 +17,8 @@ namespace CellVision
 	public:
 
 		explicit RenderWidget(QWidget* parent = nullptr);
+		
+		void setUI(Ui::MainWindowClass* ui);
 
 	protected:
 
@@ -21,10 +28,10 @@ namespace CellVision
 
 	private:
 
-		QOpenGLVertexArrayObject vao;
-		QOpenGLBuffer vbo;
-		QOpenGLShaderProgram* program = nullptr;
-		QOpenGLShader* shader = nullptr;
-		QOpenGLTexture* texture = nullptr;
+		Ui::MainWindowClass* ui = nullptr;
+
+		QOpenGLBuffer defaultVbo;
+		QOpenGLVertexArrayObject defaultVao;
+		QOpenGLShaderProgram defaultProgram;
 	};
 }
