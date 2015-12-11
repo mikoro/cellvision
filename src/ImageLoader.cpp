@@ -6,7 +6,7 @@
 
 using namespace CellVision;
 
-ImageLoaderResult ImageLoader::loadFromMultipageTiff(const std::string& filePath, int channelNumber, int imageCount)
+ImageLoaderResult ImageLoader::loadFromMultipageTiff(const std::string& filePath, int channelCount, int imagesPerChannel, int selectedChannel)
 {
 	Log& log = MainWindow::getLog();
 	log.logInfo("Loading multipage TIFF image from %s", filePath);
@@ -24,14 +24,14 @@ ImageLoaderResult ImageLoader::loadFromMultipageTiff(const std::string& filePath
 	TIFFGetField(tiffFile, TIFFTAG_IMAGEWIDTH, &result.width);
 	TIFFGetField(tiffFile, TIFFTAG_IMAGELENGTH, &result.height);
 
-	result.count = imageCount;
-	result.data.reserve(result.width * result.height * result.count);
+	result.depth = imagesPerChannel;
+	result.data.reserve(result.width * result.height * result.depth);
 
 	std::vector<uint32_t> tempData(result.width * result.height);
 
-	for (int i = 0; i < imageCount; ++i)
+	for (int i = 0; i < imagesPerChannel; ++i)
 	{
-		int directoryIndex = i * 5 + channelNumber;
+		int directoryIndex = i * channelCount + selectedChannel;
 
 		if (!TIFFSetDirectory(tiffFile, directoryIndex))
 		{

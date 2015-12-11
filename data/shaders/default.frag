@@ -4,9 +4,9 @@ in vec3 texcoordVarying;
 
 out vec4 color;
 
-uniform sampler2D texture0;
+uniform sampler3D texture0;
 
 void main()
 {
-	color = texture(texture0, texcoordVarying.xy);
+	color = texture(texture0, texcoordVarying);
 }

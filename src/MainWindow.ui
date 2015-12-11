@@ -140,6 +140,9 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="value">
+           <number>3</number>
+          </property>
          </widget>
         </item>
         <item row="2" column="1">
@@ -168,6 +171,20 @@
          <widget class="QPushButton" name="pushButtonLoad">
           <property name="text">
            <string>Load</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Channel count</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSpinBox" name="spinBoxChannelCount">
+          <property name="value">
+           <number>5</number>
           </property>
          </widget>
         </item>

@@ -3,6 +3,8 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_2_Core>
 
+#include "ImageLoader.h"
+
 namespace Ui
 {
 	class MainWindowClass;
@@ -19,6 +21,7 @@ namespace CellVision
 		explicit RenderWidget(QWidget* parent = nullptr);
 		
 		void setUI(Ui::MainWindowClass* ui);
+		void uploadImageData(const ImageLoaderResult& result);
 
 	protected:
 

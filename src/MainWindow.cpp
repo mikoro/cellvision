@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
 
-	resize(1280, 800);
+	resize(800, 800);
 	ui.splitterMain->setSizes({ 500, 10 });
 
 	ui.renderWidget->setUI(&ui);
@@ -36,10 +36,13 @@ void MainWindow::on_pushButtonBrowseImageFilePath_clicked()
 void MainWindow::on_pushButtonLoad_clicked()
 {
 	std::string filePath = ui.lineEditImageFilePath->text().toStdString();
+	int channelCount = ui.spinBoxChannelCount->value();
 	int imagesPerChannel = ui.spinBoxImagesPerChannel->value();
 	int selectedChannel = ui.spinBoxSelectedChannel->value();
 
-	ImageLoaderResult result = ImageLoader::loadFromMultipageTiff(filePath, selectedChannel, imagesPerChannel);
+	ImageLoaderResult result = ImageLoader::loadFromMultipageTiff(filePath, channelCount, imagesPerChannel, selectedChannel);
+
+	ui.renderWidget->uploadImageData(result);
 }
 
 void MainWindow::on_horizontalSliderZDepth_valueChanged()

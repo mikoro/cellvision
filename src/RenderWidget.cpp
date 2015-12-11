@@ -5,7 +5,7 @@
 
 using namespace CellVision;
 
-RenderWidget::RenderWidget(QWidget* parent) : QOpenGLWidget(parent), defaultTexture(QOpenGLTexture::Target2D)
+RenderWidget::RenderWidget(QWidget* parent) : QOpenGLWidget(parent), defaultTexture(QOpenGLTexture::Target3D)
 {
 	connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
 }
@@ -13,6 +13,21 @@ RenderWidget::RenderWidget(QWidget* parent) : QOpenGLWidget(parent), defaultText
 void RenderWidget::setUI(Ui::MainWindowClass* ui_)
 {
 	ui = ui_;
+}
+
+void RenderWidget::uploadImageData(const ImageLoaderResult& result)
+{
+	defaultTexture.destroy();
+	defaultTexture.create();
+	defaultTexture.bind();
+	defaultTexture.setFormat(QOpenGLTexture::RGBA8_UNorm);
+	defaultTexture.setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
+	defaultTexture.setWrapMode(QOpenGLTexture::ClampToEdge);
+	defaultTexture.setMipLevels(1);
+	defaultTexture.setSize(result.width, result.height, result.depth);
+	defaultTexture.allocateStorage(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8);
+	defaultTexture.setData(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, &result.data[0]);
+	defaultTexture.release();
 }
 
 void RenderWidget::initializeGL()
@@ -34,15 +49,6 @@ void RenderWidget::initializeGL()
 	defaultProgram.link();
 	defaultProgram.bind();
 
-	QImage testImage("test.png");
-
-	defaultTexture.create();
-	defaultTexture.bind();
-	defaultTexture.setFormat(QOpenGLTexture::RGBA8_UNorm);
-	defaultTexture.setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
-	defaultTexture.setWrapMode(QOpenGLTexture::ClampToEdge);
-	defaultTexture.setData(testImage);
-
 	defaultVbo.create();
 	defaultVbo.bind();
 	defaultVbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
@@ -58,7 +64,6 @@ void RenderWidget::initializeGL()
 	
 	defaultVao.release();
 	defaultVbo.release();
-	defaultTexture.release();
 	defaultProgram.release();
 }
 
@@ -73,12 +78,17 @@ void RenderWidget::paintGL()
 
 	defaultProgram.bind();
 	defaultVao.bind();
-	defaultTexture.bind();
+	
+	if (defaultTexture.isCreated())
+		defaultTexture.bind();
 
 	defaultProgram.setUniformValue("texcoordZ", float(ui->doubleSpinBoxZDepth->value()));
 	defaultProgram.setUniformValue("texture0", 0);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	if (defaultTexture.isCreated())
+		defaultTexture.release();
 
 	defaultVao.release();
 	defaultProgram.release();
