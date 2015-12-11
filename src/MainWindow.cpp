@@ -44,6 +44,6 @@ void MainWindow::on_pushButtonLoad_clicked()
 
 void MainWindow::on_horizontalSliderZDepth_valueChanged()
 {
-	double value = ui.horizontalSliderZDepth->value() / 1000.0;
+	double value = ui.horizontalSliderZDepth->value() / 10000.0;
 	ui.doubleSpinBoxZDepth->setValue(value);
 }
