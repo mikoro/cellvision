@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>CellVision</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="MainWindow.qrc">
+    <normaloff>:/icon/platform/windows/cellvision.ico</normaloff>:/icon/platform/windows/cellvision.ico</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
@@ -203,6 +207,8 @@
    <header>RenderWidget.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="MainWindow.qrc"/>
+ </resources>
  <connections/>
 </ui>
