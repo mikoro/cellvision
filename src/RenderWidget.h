@@ -33,5 +33,6 @@ namespace CellVision
 		QOpenGLBuffer defaultVbo;
 		QOpenGLVertexArrayObject defaultVao;
 		QOpenGLShaderProgram defaultProgram;
+		QOpenGLTexture defaultTexture;
 	};
 }

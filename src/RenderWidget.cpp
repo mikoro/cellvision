@@ -5,7 +5,7 @@
 
 using namespace CellVision;
 
-RenderWidget::RenderWidget(QWidget* parent) : QOpenGLWidget(parent)
+RenderWidget::RenderWidget(QWidget* parent) : QOpenGLWidget(parent), defaultTexture(QOpenGLTexture::Target2D)
 {
 	connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
 }
@@ -34,6 +34,15 @@ void RenderWidget::initializeGL()
 	defaultProgram.link();
 	defaultProgram.bind();
 
+	QImage testImage("test.png");
+
+	defaultTexture.create();
+	defaultTexture.bind();
+	defaultTexture.setFormat(QOpenGLTexture::RGBA8_UNorm);
+	defaultTexture.setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
+	defaultTexture.setWrapMode(QOpenGLTexture::ClampToEdge);
+	defaultTexture.setData(testImage);
+
 	defaultVbo.create();
 	defaultVbo.bind();
 	defaultVbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
@@ -49,6 +58,7 @@ void RenderWidget::initializeGL()
 	
 	defaultVao.release();
 	defaultVbo.release();
+	defaultTexture.release();
 	defaultProgram.release();
 }
 
@@ -63,6 +73,7 @@ void RenderWidget::paintGL()
 
 	defaultProgram.bind();
 	defaultVao.bind();
+	defaultTexture.bind();
 
 	defaultProgram.setUniformValue("texcoordZ", float(ui->doubleSpinBoxZDepth->value()));
 	defaultProgram.setUniformValue("texture0", 0);
