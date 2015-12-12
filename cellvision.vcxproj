@@ -142,13 +142,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>bin\$(Configuration)\</OutDir>
     <IntDir>build\$(Configuration)\</IntDir>
-    <IncludePath>include;platform\windows\include;$(IncludePath)</IncludePath>
+    <IncludePath>include;platform\windows\include;platform\windows\include\tiff;$(IncludePath)</IncludePath>
     <LibraryPath>platform\windows\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>bin\$(Configuration)\</OutDir>
     <IntDir>build\$(Configuration)\</IntDir>
-    <IncludePath>include;platform\windows\include;$(IncludePath)</IncludePath>
+    <IncludePath>include;platform\windows\include;platform\windows\include\tiff;$(IncludePath)</IncludePath>
     <LibraryPath>platform\windows\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
