@@ -2,6 +2,11 @@
 
 3D image visualizer.
 
+## Download
+
+Windows: [cellvision-win-0.1.0.zip](https://github.com/mikoro/cellvision/releases/download/v0.1.0/cellvision-win-0.1.0.zip)
+Mac OS X: [cellvision-mac-0.1.0.zip](https://github.com/mikoro/cellvision/releases/download/v0.1.0/cellvision-mac-0.1.0.zip)
+
 ## Features
 
 ### Done
@@ -39,11 +44,11 @@
 - Install tiff (macports)
 - Compile and run:
     ```
-	/opt/local/libexec/qt5/bin/qmake
+    /opt/local/libexec/qt5/bin/qmake
 	make -j4
 	cd bin & ./cellvision
-	```
+    ```
 - Build app bundle:
     ```
-	platform/mac/build_bundle.sh
-	```
+    platform/mac/build_bundle.sh
+    ```
