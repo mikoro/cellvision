@@ -2,6 +2,10 @@
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_2_Core>
+#include <QOpenGLBuffer>
+#include <QOpenGLVertexArrayObject>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLTexture>
 
 #include "ImageLoader.h"
 

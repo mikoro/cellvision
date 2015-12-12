@@ -12,9 +12,13 @@
 *.gch
 *.plist
 *.exe
+*.zip
 .vs
 My*
 *sublime*
+Makefile
 Thumbs.db
 .directory
 .DS_Store
+.qmake.stash
+CellVision.app

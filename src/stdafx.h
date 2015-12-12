@@ -6,6 +6,11 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <QtWidgets/QApplication>
+#include <QOpenGLFunctions_3_2_Core>
+#include <QOpenGLBuffer>
+#include <QOpenGLVertexArrayObject>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLTexture>
 
 #include "tinyformat/tinyformat.h"
 
@@ -14,5 +19,4 @@
 #include "glm/mat4x4.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "tiff/tif_config.h"
-#include "tiff/tiffio.h"
+#include "tiffio.h"
