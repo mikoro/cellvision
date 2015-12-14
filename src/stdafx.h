@@ -6,7 +6,7 @@
 #include <QtCore>
 #include <QtWidgets>
 #include <QtWidgets/QApplication>
-#include <QOpenGLFunctions_3_2_Core>
+#include <QOpenGLFunctions>
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>

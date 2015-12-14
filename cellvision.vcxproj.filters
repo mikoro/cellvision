@@ -112,11 +112,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="platform\windows\cellvision.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="platform\windows\cellvision.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>

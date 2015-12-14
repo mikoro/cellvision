@@ -1,11 +1,12 @@
 #pragma once
 
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions_3_2_Core>
+#include <QOpenGLFunctions>
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
+#include <QElapsedTimer>
 
 #include "ImageLoader.h"
 
@@ -16,7 +17,7 @@ namespace Ui
 
 namespace CellVision
 {
-	class RenderWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_2_Core
+	class RenderWidget : public QOpenGLWidget, protected QOpenGLFunctions
 	{
 		Q_OBJECT
 
@@ -35,7 +36,11 @@ namespace CellVision
 
 	private:
 
+		void updateLogic();
+
 		Ui::MainWindowClass* ui = nullptr;
+
+		QElapsedTimer timer;
 
 		QOpenGLBuffer defaultVbo;
 		QOpenGLVertexArrayObject defaultVao;

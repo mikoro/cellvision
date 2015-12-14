@@ -6,6 +6,9 @@
 
 using namespace CellVision;
 
+std::map<int, bool> MainWindow::keyMap;
+std::map<int, bool> MainWindow::keyMapOnce;
+
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
@@ -22,6 +25,52 @@ Log& MainWindow::getLog()
 	return log;
 }
 
+bool MainWindow::keyIsDown(int key)
+{
+	if (keyMap.count(key) == 0)
+		return false;
+
+	return keyMap[key];
+}
+
+bool MainWindow::keyIsDownOnce(int key)
+{
+	if (keyMap.count(key) == 0 || keyMapOnce[key])
+		return false;
+
+	if (keyMap[key])
+	{
+		keyMapOnce[key] = true;
+		return true;
+	}
+
+	return false;
+}
+
+bool MainWindow::event(QEvent* event)
+{
+	if (event->type() == QEvent::KeyPress)
+	{
+		QKeyEvent* ke = static_cast<QKeyEvent*>(event);
+
+		if (!ke->isAutoRepeat())
+			keyMap[ke->key()] = true;
+	}
+
+	if (event->type() == QEvent::KeyRelease)
+	{
+		QKeyEvent* ke = static_cast<QKeyEvent*>(event);
+
+		if (!ke->isAutoRepeat())
+		{
+			keyMap[ke->key()] = false;
+			keyMapOnce[ke->key()] = false;
+		}
+	}
+
+	return QMainWindow::event(event);
+}
+
 void MainWindow::on_pushButtonBrowseImageFilePath_clicked()
 {
 	QFileDialog fileDialog(this);
@@ -35,6 +84,8 @@ void MainWindow::on_pushButtonBrowseImageFilePath_clicked()
 
 void MainWindow::on_pushButtonLoad_clicked()
 {
+	this->setCursor(Qt::WaitCursor);
+
 	std::string filePath = ui.lineEditImageFilePath->text().toStdString();
 	int channelCount = ui.spinBoxChannelCount->value();
 	int imagesPerChannel = ui.spinBoxImagesPerChannel->value();
@@ -43,6 +94,8 @@ void MainWindow::on_pushButtonLoad_clicked()
 	ImageLoaderResult result = ImageLoader::loadFromMultipageTiff(filePath, channelCount, imagesPerChannel, selectedChannel);
 
 	ui.renderWidget->uploadImageData(result);
+
+	this->setCursor(Qt::ArrowCursor);
 }
 
 void MainWindow::on_horizontalSliderZDepth_valueChanged()

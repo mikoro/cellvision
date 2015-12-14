@@ -105,12 +105,6 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="platform\windows\cellvision.ico">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="platform\windows\cellvision.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -65,6 +65,8 @@ void RenderWidget::initializeGL()
 	defaultVao.release();
 	defaultVbo.release();
 	defaultProgram.release();
+
+	timer.start();
 }
 
 void RenderWidget::resizeGL(int width, int height)
@@ -73,6 +75,8 @@ void RenderWidget::resizeGL(int width, int height)
 
 void RenderWidget::paintGL()
 {
+	updateLogic();
+
 	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -92,4 +96,10 @@ void RenderWidget::paintGL()
 
 	defaultVao.release();
 	defaultProgram.release();
+}
+
+void RenderWidget::updateLogic()
+{
+	double timeStep = timer.nsecsElapsed() / 1000000000.0;
+	timer.restart();
 }
