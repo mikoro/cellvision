@@ -19,6 +19,7 @@ namespace CellVision
 		static Log& getLog();
 		static bool keyIsDown(int key);
 		static bool keyIsDownOnce(int key);
+		static QVector4D getMouseDelta();
 
 	protected:
 
@@ -36,5 +37,8 @@ namespace CellVision
 
 		static std::map<int, bool> keyMap;
 		static std::map<int, bool> keyMapOnce;
+		static QVector4D mouseDelta;
+
+		QPoint lastMousePosition;
 	};
 }

@@ -8,6 +8,7 @@ using namespace CellVision;
 
 std::map<int, bool> MainWindow::keyMap;
 std::map<int, bool> MainWindow::keyMapOnce;
+QVector4D MainWindow::mouseDelta;
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 {
@@ -47,6 +48,11 @@ bool MainWindow::keyIsDownOnce(int key)
 	return false;
 }
 
+QVector4D MainWindow::getMouseDelta()
+{
+	return mouseDelta;
+}
+
 bool MainWindow::event(QEvent* event)
 {
 	if (event->type() == QEvent::KeyPress)
@@ -66,6 +72,28 @@ bool MainWindow::event(QEvent* event)
 			keyMap[ke->key()] = false;
 			keyMapOnce[ke->key()] = false;
 		}
+	}
+
+	if (event->type() == QEvent::MouseMove)
+	{
+		QMouseEvent* me = static_cast<QMouseEvent*>(event);
+
+		QPoint tempDelta = me->globalPos() - lastMousePosition;
+		mouseDelta.setX(tempDelta.x());
+		mouseDelta.setY(tempDelta.y());
+		lastMousePosition = me->globalPos();
+
+		//tfm::printf("x: %f y: %f z: %f w: %f\n", mouseDelta.x(), mouseDelta.y(), mouseDelta.z(), mouseDelta.w());
+	}
+
+	if (event->type() == QEvent::Wheel)
+	{
+		QWheelEvent* we = static_cast<QWheelEvent*>(event);
+
+		mouseDelta.setZ(we->angleDelta().x() / 120.0);
+		mouseDelta.setW(we->angleDelta().y() / 120.0);
+
+		//tfm::printf("x: %f y: %f z: %f w: %f\n", mouseDelta.x(), mouseDelta.y(), mouseDelta.z(), mouseDelta.w());
 	}
 
 	return QMainWindow::event(event);
