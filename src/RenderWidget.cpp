@@ -22,7 +22,8 @@ void RenderWidget::uploadImageData(const ImageLoaderResult& result)
 	defaultTexture.bind();
 	defaultTexture.setFormat(QOpenGLTexture::RGBA8_UNorm);
 	defaultTexture.setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
-	defaultTexture.setWrapMode(QOpenGLTexture::ClampToEdge);
+	defaultTexture.setWrapMode(QOpenGLTexture::ClampToBorder);
+	defaultTexture.setBorderColor(0.0f, 0.0f, 0.0f, 1.0f);
 	defaultTexture.setMipLevels(1);
 	defaultTexture.setSize(result.width, result.height, result.depth);
 	defaultTexture.allocateStorage(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8);
@@ -86,8 +87,8 @@ void RenderWidget::paintGL()
 	if (defaultTexture.isCreated())
 		defaultTexture.bind();
 
-	defaultProgram.setUniformValue("texcoordZ", float(ui->doubleSpinBoxZDepth->value()));
 	defaultProgram.setUniformValue("texture0", 0);
+	defaultProgram.setUniformValue("objectToWorld", objectToWorld);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -100,6 +101,53 @@ void RenderWidget::paintGL()
 
 void RenderWidget::updateLogic()
 {
-	double timeStep = timer.nsecsElapsed() / 1000000000.0;
+	float timeStep = timer.nsecsElapsed() / 1000000000.0f;
 	timer.restart();
+
+	if (MainWindow::keyIsDown(Qt::Key_R))
+	{
+		cameraPosition = QVector3D();
+		cameraRotation = QVector2D();
+	}
+
+	cameraRotation[0] += MainWindow::getMouseDelta().y() * 0.1f * timeStep;
+	cameraRotation[1] += MainWindow::getMouseDelta().x() * 0.1f * timeStep;
+
+	//tfm::printfln("x: %f y: %f", cameraRotation[0], cameraRotation[1]);
+
+	QVector3D cameraForward;
+
+	// is [0 0 -1] when angles are zero
+	cameraForward[0] = -sin(cameraRotation[1]) * cos(cameraRotation[0]);
+	cameraForward[1] = sin(cameraRotation[0]);
+	cameraForward[2] = -cos(cameraRotation[1]) * cos(cameraRotation[0]);
+	cameraForward = -cameraForward;
+	cameraForward.normalize();
+
+	QVector3D cameraRight = QVector3D::crossProduct(QVector3D(0.0001f, 1.0f, 0.0001f), cameraForward).normalized();
+	QVector3D cameraUp = QVector3D::crossProduct(cameraForward, cameraRight).normalized();
+
+	if (MainWindow::keyIsDown(Qt::Key_W))
+		cameraPosition += cameraForward * timeStep;
+
+	if (MainWindow::keyIsDown(Qt::Key_S))
+		cameraPosition -= cameraForward * timeStep;
+
+	if (MainWindow::keyIsDown(Qt::Key_D))
+		cameraPosition += cameraRight * timeStep;
+
+	if (MainWindow::keyIsDown(Qt::Key_A))
+		cameraPosition -= cameraRight * timeStep;
+
+	if (MainWindow::keyIsDown(Qt::Key_E))
+		cameraPosition += cameraUp * timeStep;
+
+	if (MainWindow::keyIsDown(Qt::Key_Q))
+		cameraPosition -= cameraUp * timeStep;
+
+	objectToWorld.setToIdentity();
+	objectToWorld.setColumn(0, QVector4D(cameraRight[0], cameraRight[1], cameraRight[2], 0.0f));
+	objectToWorld.setColumn(1, QVector4D(cameraUp[0], cameraUp[1], cameraUp[2], 0.0f));
+	objectToWorld.setColumn(2, QVector4D(cameraForward[0], cameraForward[1], cameraForward[2], 0.0f));
+	objectToWorld.setColumn(3, QVector4D(cameraPosition[0], cameraPosition[1], cameraPosition[2], 1.0f));
 }

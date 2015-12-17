@@ -1,6 +1,6 @@
 #version 330
 
-in vec3 texcoordVarying;
+in vec3 worldPositionVarying;
 
 out vec4 color;
 
@@ -8,5 +8,5 @@ uniform sampler3D texture0;
 
 void main()
 {
-	color = texture(texture0, texcoordVarying);
+	color = texture(texture0, worldPositionVarying);
 }

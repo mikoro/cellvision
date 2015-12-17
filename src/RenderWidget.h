@@ -46,5 +46,9 @@ namespace CellVision
 		QOpenGLVertexArrayObject defaultVao;
 		QOpenGLShaderProgram defaultProgram;
 		QOpenGLTexture defaultTexture;
+
+		QMatrix4x4 objectToWorld;
+		QVector3D cameraPosition;
+		QVector2D cameraRotation;
 	};
 }

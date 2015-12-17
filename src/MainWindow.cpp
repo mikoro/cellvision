@@ -18,6 +18,11 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 	ui.splitterMain->setSizes({ 500, 10 });
 
 	ui.renderWidget->setUI(&ui);
+
+	resetMouseDeltaTimer.setInterval(100);
+	resetMouseDeltaTimer.setSingleShot(true);
+
+	connect(&resetMouseDeltaTimer, SIGNAL(timeout()), this, SLOT(resetMouseDelta()));
 }
 
 Log& MainWindow::getLog()
@@ -78,11 +83,15 @@ bool MainWindow::event(QEvent* event)
 	{
 		QMouseEvent* me = static_cast<QMouseEvent*>(event);
 
-		QPoint tempDelta = me->globalPos() - lastMousePosition;
-		mouseDelta.setX(tempDelta.x());
-		mouseDelta.setY(tempDelta.y());
-		lastMousePosition = me->globalPos();
+		if (me->buttons() == Qt::LeftButton)
+		{
+			QPoint tempDelta = me->globalPos() - lastMousePosition;
+			mouseDelta.setX(tempDelta.x());
+			mouseDelta.setY(tempDelta.y());
+		}
 
+		lastMousePosition = me->globalPos();
+		resetMouseDeltaTimer.start();
 		//tfm::printf("x: %f y: %f z: %f w: %f\n", mouseDelta.x(), mouseDelta.y(), mouseDelta.z(), mouseDelta.w());
 	}
 
@@ -93,6 +102,7 @@ bool MainWindow::event(QEvent* event)
 		mouseDelta.setZ(we->angleDelta().x() / 120.0);
 		mouseDelta.setW(we->angleDelta().y() / 120.0);
 
+		resetMouseDeltaTimer.start();
 		//tfm::printf("x: %f y: %f z: %f w: %f\n", mouseDelta.x(), mouseDelta.y(), mouseDelta.z(), mouseDelta.w());
 	}
 
@@ -130,4 +140,12 @@ void MainWindow::on_horizontalSliderZDepth_valueChanged()
 {
 	double value = ui.horizontalSliderZDepth->value() / 10000.0;
 	ui.doubleSpinBoxZDepth->setValue(value);
+}
+
+void MainWindow::resetMouseDelta()
+{
+	mouseDelta.setX(0.0f);
+	mouseDelta.setY(0.0f);
+	mouseDelta.setZ(0.0f);
+	mouseDelta.setW(0.0f);
 }
