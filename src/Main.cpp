@@ -45,15 +45,6 @@ int main(int argc, char *argv[])
 	staticLog = &log;
 	qInstallMessageHandler(messageHandler);
 
-	QSurfaceFormat format;
-	format.setDepthBufferSize(24);
-	format.setStencilBufferSize(8);
-	format.setSwapInterval(1);
-	//format.setSamples(4);
-	//format.setVersion(3, 2);
-	//format.setProfile(QSurfaceFormat::CoreProfile);
-	QSurfaceFormat::setDefaultFormat(format);
-
 	try
 	{
 		mainWindow.show();

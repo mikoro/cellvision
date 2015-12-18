@@ -5,8 +5,17 @@
 
 using namespace CellVision;
 
-RenderWidget::RenderWidget(QWidget* parent) : QOpenGLWidget(parent), defaultTexture(QOpenGLTexture::Target3D)
+RenderWidget::RenderWidget(QWidget* parent) : QOpenGLWidget(parent), volumeTexture(QOpenGLTexture::Target3D)
 {
+	QSurfaceFormat format;
+	format.setDepthBufferSize(24);
+	format.setStencilBufferSize(8);
+	format.setSwapInterval(1);
+	format.setSamples(8);
+	//format.setVersion(3, 2);
+	//format.setProfile(QSurfaceFormat::CoreProfile);
+	setFormat(format);
+
 	connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
 }
 
@@ -17,57 +26,117 @@ void RenderWidget::setUI(Ui::MainWindowClass* ui_)
 
 void RenderWidget::uploadImageData(const ImageLoaderResult& result)
 {
-	defaultTexture.destroy();
-	defaultTexture.create();
-	defaultTexture.bind();
-	defaultTexture.setFormat(QOpenGLTexture::RGBA8_UNorm);
-	defaultTexture.setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
-	defaultTexture.setWrapMode(QOpenGLTexture::ClampToBorder);
-	defaultTexture.setBorderColor(0.0f, 0.0f, 0.0f, 1.0f);
-	defaultTexture.setMipLevels(1);
-	defaultTexture.setSize(result.width, result.height, result.depth);
-	defaultTexture.allocateStorage(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8);
-	defaultTexture.setData(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, &result.data[0]);
-	defaultTexture.release();
+	volumeTexture.destroy();
+	volumeTexture.create();
+	volumeTexture.bind();
+	volumeTexture.setFormat(QOpenGLTexture::RGBA8_UNorm);
+	volumeTexture.setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
+	volumeTexture.setWrapMode(QOpenGLTexture::ClampToBorder);
+	volumeTexture.setBorderColor(0.0f, 0.0f, 0.0f, 1.0f);
+	volumeTexture.setMipLevels(1);
+	volumeTexture.setSize(result.width, result.height, result.depth);
+	volumeTexture.allocateStorage(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8);
+	volumeTexture.setData(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, &result.data[0]);
+	volumeTexture.release();
 }
 
 void RenderWidget::initializeGL()
 {
 	initializeOpenGLFunctions();
 
-	const GLfloat vertexData[] =
+#define VERTEX1 -1, -1, -1, 0, 0, 0
+#define VERTEX2 1, -1, -1, 1, 0, 0
+#define VERTEX3 -1, 1, -1, 0, 1, 0
+#define VERTEX4 1, 1, -1, 1, 1, 0
+#define VERTEX5 -1, -1, 1, 0, 0, 1
+#define VERTEX6 1, -1, 1, 1, 0, 1
+#define VERTEX7 -1, 1, 1, 0, 1, 1
+#define VERTEX8 1, 1, 1, 1, 1, 1
+
+	// CUBE //
+
+	const GLfloat cubeVertexData[] =
 	{
-		-1.0f, -1.0f, 0.0f, 0.0f,
-		1.0f, -1.0f, 1.0f, 0.0f,
-		1.0f, 1.0f, 1.0f, 1.0f,
-		-1.0f, -1.0f, 0.0f, 0.0f,
-		1.0f, 1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f, 0.0f, 1.0f,
+		VERTEX1, VERTEX2, VERTEX4,
+		VERTEX1, VERTEX4, VERTEX3,
+		VERTEX2, VERTEX6, VERTEX8,
+		VERTEX2, VERTEX8, VERTEX4,
+		VERTEX6, VERTEX5, VERTEX7,
+		VERTEX6, VERTEX7, VERTEX8,
+		VERTEX5, VERTEX1, VERTEX3,
+		VERTEX5, VERTEX3, VERTEX7,
+		VERTEX1, VERTEX6, VERTEX5,
+		VERTEX1, VERTEX2, VERTEX6,
+		VERTEX3, VERTEX8, VERTEX7,
+		VERTEX3, VERTEX4, VERTEX8
 	};
 
-	defaultProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/default.vert");
-	defaultProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, "data/shaders/default.frag");
-	defaultProgram.link();
-	defaultProgram.bind();
+	cubeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/cube.vert");
+	cubeProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, "data/shaders/cube.frag");
+	cubeProgram.link();
+	cubeProgram.bind();
 
-	defaultVbo.create();
-	defaultVbo.bind();
-	defaultVbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-	defaultVbo.allocate(vertexData, sizeof(vertexData));
+	cubeVbo.create();
+	cubeVbo.bind();
+	cubeVbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
+	cubeVbo.allocate(cubeVertexData, sizeof(cubeVertexData));
 
-	defaultVao.create();
-	defaultVao.bind();
+	cubeVao.create();
+	cubeVao.bind();
 
-	defaultProgram.enableAttributeArray("position");
-	defaultProgram.enableAttributeArray("texcoord");
-	defaultProgram.setAttributeBuffer("position", GL_FLOAT, 0, 2, 4 * sizeof(GLfloat));
-	defaultProgram.setAttributeBuffer("texcoord", GL_FLOAT, 2 * sizeof(GLfloat), 2, 4 * sizeof(GLfloat));
+	cubeProgram.enableAttributeArray("position");
+	cubeProgram.enableAttributeArray("texcoord");
+	cubeProgram.setAttributeBuffer("position", GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
+	cubeProgram.setAttributeBuffer("texcoord", GL_FLOAT, 3 * sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
 	
-	defaultVao.release();
-	defaultVbo.release();
-	defaultProgram.release();
+	cubeVao.release();
+	cubeVbo.release();
+	cubeProgram.release();
+
+	// CUBE LINES //
+
+	const GLfloat cubeLinesVertexData[] =
+	{
+		VERTEX1, VERTEX2,
+		VERTEX2, VERTEX4,
+		VERTEX4, VERTEX3,
+		VERTEX3, VERTEX1,
+		VERTEX2, VERTEX6,
+		VERTEX6, VERTEX5,
+		VERTEX5, VERTEX1,
+		VERTEX6, VERTEX8,
+		VERTEX8, VERTEX7,
+		VERTEX7, VERTEX5,
+		VERTEX4, VERTEX8,
+		VERTEX3, VERTEX7
+	};
+
+	linesProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/lines.vert");
+	linesProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, "data/shaders/lines.frag");
+	linesProgram.link();
+	linesProgram.bind();
+
+	cubeLinesVbo.create();
+	cubeLinesVbo.bind();
+	cubeLinesVbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
+	cubeLinesVbo.allocate(cubeLinesVertexData, sizeof(cubeLinesVertexData));
+
+	cubeLinesVao.create();
+	cubeLinesVao.bind();
+
+	cubeProgram.enableAttributeArray("position");
+	cubeProgram.enableAttributeArray("texcoord");
+	cubeProgram.setAttributeBuffer("position", GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
+	cubeProgram.setAttributeBuffer("texcoord", GL_FLOAT, 3 * sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
+
+	cubeLinesVao.release();
+	cubeLinesVbo.release();
+	linesProgram.release();
+
+	// MISC //
 
 	timer.start();
+	resetCamera();
 }
 
 void RenderWidget::resizeGL(int width, int height)
@@ -78,25 +147,42 @@ void RenderWidget::paintGL()
 {
 	updateLogic();
 
-	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_MULTISAMPLE);
+	glLineWidth(4.0f);
 
-	defaultProgram.bind();
-	defaultVao.bind();
+	// CUBE //
+
+	cubeProgram.bind();
+	cubeVao.bind();
 	
-	if (defaultTexture.isCreated())
-		defaultTexture.bind();
+	if (volumeTexture.isCreated())
+		volumeTexture.bind();
 
-	defaultProgram.setUniformValue("texture0", 0);
-	defaultProgram.setUniformValue("objectToWorld", objectToWorld);
+	cubeProgram.setUniformValue("texture0", 0);
+	cubeProgram.setUniformValue("mvp", cubeMvp);
 
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 
-	if (defaultTexture.isCreated())
-		defaultTexture.release();
+	if (volumeTexture.isCreated())
+		volumeTexture.release();
 
-	defaultVao.release();
-	defaultProgram.release();
+	cubeVao.release();
+	cubeProgram.release();
+
+	// CUBE LINES //
+
+	linesProgram.bind();
+	cubeLinesVao.bind();
+
+	linesProgram.setUniformValue("mvp", cubeMvp);
+
+	glDrawArrays(GL_LINES, 0, 24);
+
+	cubeLinesVao.release();
+	linesProgram.release();
 }
 
 void RenderWidget::updateLogic()
@@ -104,28 +190,31 @@ void RenderWidget::updateLogic()
 	float timeStep = timer.nsecsElapsed() / 1000000000.0f;
 	timer.restart();
 
+	QMatrix4x4 cubeModel;
+	cubeModel.setToIdentity();
+
+	QMatrix4x4 view;
+	view.setToIdentity();
+	view.rotate(cameraRotation[0], QVector3D(1, 0, 0));
+	view.rotate(cameraRotation[1], QVector3D(0, 1, 0));
+	view.translate(cameraPosition);
+
+	QMatrix4x4 projection;
+	projection.setToIdentity();
+	float aspectRatio = float(ui->renderWidget->width()) / float(ui->renderWidget->height());
+	projection.perspective(45.0f, aspectRatio, 0.1f, 100.0f);
+
+	cubeMvp = projection * view * cubeModel;
+
 	if (MainWindow::keyIsDown(Qt::Key_R))
-	{
-		cameraPosition = QVector3D();
-		cameraRotation = QVector2D();
-	}
+		resetCamera();
 
-	cameraRotation[0] += MainWindow::getMouseDelta().y() * 0.1f * timeStep;
-	cameraRotation[1] += MainWindow::getMouseDelta().x() * 0.1f * timeStep;
+	cameraRotation[0] += MainWindow::getMouseDelta().y() * 4.0f * timeStep;
+	cameraRotation[1] += MainWindow::getMouseDelta().x() * 4.0f * timeStep;
 
-	//tfm::printfln("x: %f y: %f", cameraRotation[0], cameraRotation[1]);
-
-	QVector3D cameraForward;
-
-	// is [0 0 -1] when angles are zero
-	cameraForward[0] = -sin(cameraRotation[1]) * cos(cameraRotation[0]);
-	cameraForward[1] = sin(cameraRotation[0]);
-	cameraForward[2] = -cos(cameraRotation[1]) * cos(cameraRotation[0]);
-	cameraForward = -cameraForward;
-	cameraForward.normalize();
-
-	QVector3D cameraRight = QVector3D::crossProduct(QVector3D(0.0001f, 1.0f, 0.0001f), cameraForward).normalized();
-	QVector3D cameraUp = QVector3D::crossProduct(cameraForward, cameraRight).normalized();
+	QVector3D cameraForward = view.row(2).toVector3D().normalized();
+	QVector3D cameraRight = -view.row(0).toVector3D().normalized();
+	QVector3D cameraUp = -view.row(1).toVector3D().normalized();
 
 	if (MainWindow::keyIsDown(Qt::Key_W))
 		cameraPosition += cameraForward * timeStep;
@@ -144,10 +233,10 @@ void RenderWidget::updateLogic()
 
 	if (MainWindow::keyIsDown(Qt::Key_Q))
 		cameraPosition -= cameraUp * timeStep;
+}
 
-	objectToWorld.setToIdentity();
-	objectToWorld.setColumn(0, QVector4D(cameraRight[0], cameraRight[1], cameraRight[2], 0.0f));
-	objectToWorld.setColumn(1, QVector4D(cameraUp[0], cameraUp[1], cameraUp[2], 0.0f));
-	objectToWorld.setColumn(2, QVector4D(cameraForward[0], cameraForward[1], cameraForward[2], 0.0f));
-	objectToWorld.setColumn(3, QVector4D(cameraPosition[0], cameraPosition[1], cameraPosition[2], 1.0f));
+void RenderWidget::resetCamera()
+{
+	cameraRotation = QVector2D(36.2972794f, -45.6924248f);
+	cameraPosition = QVector3D(-3.30962682f, -3.19945812f, -3.20841980f);
 }

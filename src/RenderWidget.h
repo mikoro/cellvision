@@ -37,17 +37,28 @@ namespace CellVision
 	private:
 
 		void updateLogic();
+		void resetCamera();
 
 		Ui::MainWindowClass* ui = nullptr;
 
 		QElapsedTimer timer;
 
-		QOpenGLBuffer defaultVbo;
-		QOpenGLVertexArrayObject defaultVao;
-		QOpenGLShaderProgram defaultProgram;
-		QOpenGLTexture defaultTexture;
+		QOpenGLTexture volumeTexture;
 
-		QMatrix4x4 objectToWorld;
+		QOpenGLBuffer cubeVbo;
+		QOpenGLVertexArrayObject cubeVao;
+		QOpenGLShaderProgram cubeProgram;
+		QMatrix4x4 cubeMvp;
+
+		QOpenGLBuffer cubeLinesVbo;
+		QOpenGLVertexArrayObject cubeLinesVao;
+		QOpenGLShaderProgram linesProgram;
+
+		QOpenGLBuffer planeVbo;
+		QOpenGLVertexArrayObject planeVao;
+		QOpenGLShaderProgram planeProgram;
+		QMatrix4x4 planeMvp;
+
 		QVector3D cameraPosition;
 		QVector2D cameraRotation;
 	};

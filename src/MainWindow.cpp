@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
 
-	resize(800, 800);
+	resize(1280, 1000);
 	ui.splitterMain->setSizes({ 500, 10 });
 
 	ui.renderWidget->setUI(&ui);
@@ -66,6 +66,9 @@ bool MainWindow::event(QEvent* event)
 
 		if (!ke->isAutoRepeat())
 			keyMap[ke->key()] = true;
+
+		if (ke->key() == Qt::Key_Escape)
+			close();
 	}
 
 	if (event->type() == QEvent::KeyRelease)
@@ -92,7 +95,6 @@ bool MainWindow::event(QEvent* event)
 
 		lastMousePosition = me->globalPos();
 		resetMouseDeltaTimer.start();
-		//tfm::printf("x: %f y: %f z: %f w: %f\n", mouseDelta.x(), mouseDelta.y(), mouseDelta.z(), mouseDelta.w());
 	}
 
 	if (event->type() == QEvent::Wheel)
@@ -103,7 +105,14 @@ bool MainWindow::event(QEvent* event)
 		mouseDelta.setW(we->angleDelta().y() / 120.0);
 
 		resetMouseDeltaTimer.start();
-		//tfm::printf("x: %f y: %f z: %f w: %f\n", mouseDelta.x(), mouseDelta.y(), mouseDelta.z(), mouseDelta.w());
+	}
+
+	if (event->type() == QEvent::MouseButtonRelease)
+	{
+		mouseDelta.setX(0.0f);
+		mouseDelta.setY(0.0f);
+		mouseDelta.setZ(0.0f);
+		mouseDelta.setW(0.0f);
 	}
 
 	return QMainWindow::event(event);
