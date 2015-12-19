@@ -9,6 +9,7 @@ CONFIG += release warn_off c++11 qt
 CONFIG -= app_bundle
 QT += core gui widgets
 LIBS += -ltiff
+QMAKE_CXXFLAGS += -mmacosx-version-min=10.9
 QMAKE_POST_LINK += platform/mac/post-build.sh
 
 INCLUDEPATH += include \

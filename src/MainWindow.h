@@ -2,6 +2,8 @@
 
 #include <map>
 
+#include <QTimer>
+
 #include "ui_MainWindow.h"
 
 namespace CellVision
