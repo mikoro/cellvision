@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 	ui.setupUi(this);
 
 	resize(1280, 1000);
-	ui.splitterMain->setSizes({ 500, 10 });
+	ui.splitterMain->setSizes({ 1000, 1 });
 
 	ui.renderWidget->setUI(&ui);
 
@@ -23,6 +23,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 	resetMouseDeltaTimer.setSingleShot(true);
 
 	connect(&resetMouseDeltaTimer, SIGNAL(timeout()), this, SLOT(resetMouseDelta()));
+
+	setFocus();
 }
 
 Log& MainWindow::getLog()
@@ -143,12 +145,6 @@ void MainWindow::on_pushButtonLoad_clicked()
 	ui.renderWidget->uploadImageData(result);
 
 	this->setCursor(Qt::ArrowCursor);
-}
-
-void MainWindow::on_horizontalSliderZDepth_valueChanged()
-{
-	double value = ui.horizontalSliderZDepth->value() / 10000.0;
-	ui.doubleSpinBoxZDepth->setValue(value);
 }
 
 void MainWindow::resetMouseDelta()

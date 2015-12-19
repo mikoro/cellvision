@@ -29,7 +29,6 @@ namespace CellVision
 
 		void on_pushButtonBrowseImageFilePath_clicked();
 		void on_pushButtonLoad_clicked();
-		void on_horizontalSliderZDepth_valueChanged();
 		void resetMouseDelta();
 
 	private:

@@ -30,6 +30,7 @@ namespace CellVision
 
 	protected:
 
+		bool event(QEvent* event) override;
 		void initializeGL() override;
 		void resizeGL(int width, int height) override;
 		void paintGL() override;
@@ -48,16 +49,22 @@ namespace CellVision
 		QOpenGLBuffer cubeVbo;
 		QOpenGLVertexArrayObject cubeVao;
 		QOpenGLShaderProgram cubeProgram;
+		QMatrix4x4 cubeModel;
 		QMatrix4x4 cubeMvp;
 
 		QOpenGLBuffer cubeLinesVbo;
 		QOpenGLVertexArrayObject cubeLinesVao;
-		QOpenGLShaderProgram linesProgram;
+		QOpenGLShaderProgram cubeLinesProgram;
 
 		QOpenGLBuffer planeVbo;
 		QOpenGLVertexArrayObject planeVao;
 		QOpenGLShaderProgram planeProgram;
+		QMatrix4x4 planeModel;
 		QMatrix4x4 planeMvp;
+
+		QOpenGLBuffer planeLinesVbo;
+		QOpenGLVertexArrayObject planeLinesVao;
+		QOpenGLShaderProgram planeLinesProgram;
 
 		QVector3D cameraPosition;
 		QVector2D cameraRotation;
