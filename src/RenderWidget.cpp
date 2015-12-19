@@ -2,17 +2,16 @@
 
 #include "RenderWidget.h"
 #include "MainWindow.h"
+#include "Log.h"
 
 using namespace CellVision;
 
 RenderWidget::RenderWidget(QWidget* parent) : QOpenGLWidget(parent), volumeTexture(QOpenGLTexture::Target3D)
 {
 	QSurfaceFormat format;
-	format.setDepthBufferSize(24);
-	format.setStencilBufferSize(8);
 	format.setSwapInterval(1);
-	format.setSamples(8);
-	//format.setVersion(3, 2);
+	format.setSamples(4);
+	//format.setVersion(3, 3);
 	//format.setProfile(QSurfaceFormat::CoreProfile);
 	setFormat(format);
 
@@ -53,6 +52,8 @@ bool RenderWidget::event(QEvent* event)
 void RenderWidget::initializeGL()
 {
 	initializeOpenGLFunctions();
+
+	MainWindow::getLog().logInfo("OpenGL Vendor: %s | Renderer: %s | Version: %s | GLSL: %s", glGetString(GL_VENDOR), glGetString(GL_RENDERER), glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));;
 
 	// CUBE //
 
