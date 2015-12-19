@@ -56,29 +56,29 @@ void RenderWidget::initializeGL()
 
 	// CUBE //
 
-#define VERTEX1 -1, -1, -1, 0, 0, 0
-#define VERTEX2 1, -1, -1, 1, 0, 0
-#define VERTEX3 -1, 1, -1, 0, 1, 0
-#define VERTEX4 1, 1, -1, 1, 1, 0
-#define VERTEX5 -1, -1, 1, 0, 0, 1
-#define VERTEX6 1, -1, 1, 1, 0, 1
-#define VERTEX7 -1, 1, 1, 0, 1, 1
-#define VERTEX8 1, 1, 1, 1, 1, 1
+	QVector3D v1(0, 0, 1); QVector3D t1(0, 0, 1);
+	QVector3D v2(1, 0, 1); QVector3D t2(1, 0, 1);
+	QVector3D v3(0, 1, 1); QVector3D t3(0, 1, 1);
+	QVector3D v4(1, 1, 1); QVector3D t4(1, 1, 1);
+	QVector3D v5(0, 0, 0); QVector3D t5(0, 0, 0);
+	QVector3D v6(1, 0, 0); QVector3D t6(1, 0, 0);
+	QVector3D v7(0, 1, 0); QVector3D t7(0, 1, 0);
+	QVector3D v8(1, 1, 0); QVector3D t8(1, 1, 0);
 
-	const GLfloat cubeVertexData[] =
+	const QVector3D cubeVertexData[] =
 	{
-		VERTEX1, VERTEX2, VERTEX4,
-		VERTEX1, VERTEX4, VERTEX3,
-		VERTEX2, VERTEX6, VERTEX8,
-		VERTEX2, VERTEX8, VERTEX4,
-		VERTEX6, VERTEX5, VERTEX7,
-		VERTEX6, VERTEX7, VERTEX8,
-		VERTEX5, VERTEX1, VERTEX3,
-		VERTEX5, VERTEX3, VERTEX7,
-		VERTEX1, VERTEX6, VERTEX5,
-		VERTEX1, VERTEX2, VERTEX6,
-		VERTEX3, VERTEX8, VERTEX7,
-		VERTEX3, VERTEX4, VERTEX8
+		v1, t1, v2, t2, v4, t4,
+		v1, t1, v4, t4, v3, t3,
+		v2, t2, v6, t6, v8, t8,
+		v2, t2, v8, t8, v4, t4,
+		v6, t6, v5, t5, v7, t7,
+		v6, t6, v7, t7, v8, t8,
+		v5, t5, v1, t1, v3, t3,
+		v5, t5, v3, t3, v7, t7,
+		v1, t1, v6, t6, v5, t5,
+		v1, t1, v2, t2, v6, t6,
+		v3, t3, v8, t8, v7, t7,
+		v3, t3, v4, t4, v8, t8
 	};
 
 	cubeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/cube.vert");
@@ -98,27 +98,27 @@ void RenderWidget::initializeGL()
 	cubeProgram.enableAttributeArray("texcoord");
 	cubeProgram.setAttributeBuffer("position", GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
 	cubeProgram.setAttributeBuffer("texcoord", GL_FLOAT, 3 * sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
-	
+
 	cubeVao.release();
 	cubeVbo.release();
 	cubeProgram.release();
 
 	// CUBE LINES //
 
-	const GLfloat cubeLinesVertexData[] =
+	const QVector3D cubeLinesVertexData[] =
 	{
-		VERTEX1, VERTEX2,
-		VERTEX2, VERTEX4,
-		VERTEX4, VERTEX3,
-		VERTEX3, VERTEX1,
-		VERTEX2, VERTEX6,
-		VERTEX6, VERTEX5,
-		VERTEX5, VERTEX1,
-		VERTEX6, VERTEX8,
-		VERTEX8, VERTEX7,
-		VERTEX7, VERTEX5,
-		VERTEX4, VERTEX8,
-		VERTEX3, VERTEX7
+		v1, t1, v2, t2,
+		v2, t2, v4, t4,
+		v4, t4, v3, t3,
+		v3, t3, v1, t1,
+		v2, t2, v6, t6,
+		v6, t6, v5, t5,
+		v5, t5, v1, t1,
+		v6, t6, v8, t8,
+		v8, t8, v7, t7,
+		v7, t7, v5, t5,
+		v4, t4, v8, t8,
+		v3, t3, v7, t7
 	};
 
 	cubeLinesProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/lines.vert");
@@ -145,19 +145,15 @@ void RenderWidget::initializeGL()
 
 	// PLANE //
 
-#undef VERTEX1
-#undef VERTEX2
-#undef VERTEX3
-#undef VERTEX4
-#define VERTEX1 -1, -1, 0, 0, 0, 0
-#define VERTEX2 1, -1, 0, 1, 0, 0
-#define VERTEX3 1, 1, 0, 1, 1, 0
-#define VERTEX4 -1, 1, 0, 0, 1, 0
+	v1 = QVector3D(-1, -1, 0); t1 = QVector3D(-1, -1, 0);
+	v2 = QVector3D(1, -1, 0); t2 = QVector3D(1, -1, 0);
+	v3 = QVector3D(-1, 1, 0); t3 = QVector3D(-1, 1, 0);
+	v4 = QVector3D(1, 1, 0); t4 = QVector3D(1, 1, 0);
 
-	const GLfloat planeVertexData[] =
+	const QVector3D planeVertexData[] =
 	{
-		VERTEX1, VERTEX2, VERTEX3,
-		VERTEX1, VERTEX3, VERTEX4
+		v1, t1, v2, t2, v4, t4,
+		v1, t1, v4, t4, v3, t3
 	};
 
 	planeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/plane.vert");
@@ -184,12 +180,12 @@ void RenderWidget::initializeGL()
 
 	// PLANE LINES //
 
-	const GLfloat planeLinesVertexData[] =
+	const QVector3D planeLinesVertexData[] =
 	{
-		VERTEX1, VERTEX2,
-		VERTEX2, VERTEX3,
-		VERTEX3, VERTEX4,
-		VERTEX4, VERTEX1
+		v1, t1, v2, t2,
+		v2, t2, v4, t4,
+		v4, t4, v3, t3,
+		v3, t3, v1, t1
 	};
 
 	planeLinesProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/lines.vert");
@@ -231,21 +227,23 @@ void RenderWidget::paintGL()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
 	glEnable(GL_MULTISAMPLE);
 	glLineWidth(4.0f);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// CUBE //
 
 	cubeProgram.bind();
 	cubeVao.bind();
-	
+
 	if (volumeTexture.isCreated())
 		volumeTexture.bind();
 
 	cubeProgram.setUniformValue("texture0", 0);
 	cubeProgram.setUniformValue("mvp", cubeMvp);
 
-	//glDrawArrays(GL_TRIANGLES, 0, 36);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 
 	if (volumeTexture.isCreated())
 		volumeTexture.release();
@@ -257,7 +255,8 @@ void RenderWidget::paintGL()
 
 	cubeLinesProgram.bind();
 	cubeLinesVao.bind();
-	
+
+	cubeLinesProgram.setUniformValue("lineColor", QVector4D(1.0f, 1.0f, 1.0f, 0.5f));
 	cubeLinesProgram.setUniformValue("mvp", cubeMvp);
 
 	glDrawArrays(GL_LINES, 0, 24);
@@ -292,6 +291,7 @@ void RenderWidget::paintGL()
 	planeLinesProgram.bind();
 	planeLinesVao.bind();
 
+	planeLinesProgram.setUniformValue("lineColor", QVector4D(1.0f, 1.0f, 1.0f, 0.5f));
 	planeLinesProgram.setUniformValue("mvp", planeMvp);
 
 	glDrawArrays(GL_LINES, 0, 8);
@@ -316,50 +316,57 @@ void RenderWidget::updateLogic()
 	float aspectRatio = float(ui->renderWidget->width()) / float(ui->renderWidget->height());
 	projection.perspective(45.0f, aspectRatio, 0.1f, 100.0f);
 
+	float moveSpeed = 0.6f;
+
+	if (MainWindow::keyIsDown(Qt::Key_Shift))
+		moveSpeed *= 2.0f;
+
+	if (MainWindow::keyIsDown(Qt::Key_Control))
+		moveSpeed *= 0.5f;
+
 	if (MainWindow::keyIsDown(Qt::Key_R))
 		resetCamera();
 
 	cameraRotation[0] += MainWindow::getMouseDelta().y() * 4.0f * timeStep;
 	cameraRotation[1] += MainWindow::getMouseDelta().x() * 4.0f * timeStep;
 
-	QVector3D cameraForward = view.row(2).toVector3D().normalized();
-	QVector3D cameraRight = -view.row(0).toVector3D().normalized();
-	QVector3D cameraUp = -view.row(1).toVector3D().normalized();
+	QVector3D cameraForward = -view.row(2).toVector3D().normalized();
+	QVector3D cameraRight = view.row(0).toVector3D().normalized();
+	QVector3D cameraUp = view.row(1).toVector3D().normalized();
 
 	if (MainWindow::keyIsDown(Qt::Key_W))
-		cameraPosition += cameraForward * timeStep;
+		cameraPosition -= cameraForward * moveSpeed * timeStep;
 
 	if (MainWindow::keyIsDown(Qt::Key_S))
-		cameraPosition -= cameraForward * timeStep;
+		cameraPosition += cameraForward * moveSpeed * timeStep;
 
 	if (MainWindow::keyIsDown(Qt::Key_D))
-		cameraPosition += cameraRight * timeStep;
+		cameraPosition -= cameraRight * moveSpeed * timeStep;
 
 	if (MainWindow::keyIsDown(Qt::Key_A))
-		cameraPosition -= cameraRight * timeStep;
+		cameraPosition += cameraRight * moveSpeed * timeStep;
 
 	if (MainWindow::keyIsDown(Qt::Key_E))
-		cameraPosition += cameraUp * timeStep;
+		cameraPosition -= cameraUp * moveSpeed * timeStep;
 
 	if (MainWindow::keyIsDown(Qt::Key_Q))
-		cameraPosition -= cameraUp * timeStep;
+		cameraPosition += cameraUp * moveSpeed * timeStep;
 
 	cubeModel.setToIdentity();
 	cubeMvp = projection * view * cubeModel;
 
-	QVector3D planePosition = -cameraPosition - 5.0f * cameraForward;
+	QVector3D planePosition = -cameraPosition + 3.0f * cameraForward;
 
 	planeModel.setToIdentity();
 	planeModel.setColumn(0, QVector4D(cameraRight.x(), cameraRight.y(), cameraRight.z(), 0.0f));
 	planeModel.setColumn(1, QVector4D(cameraUp.x(), cameraUp.y(), cameraUp.z(), 0.0f));
-	planeModel.setColumn(2, QVector4D(-cameraForward.x(), -cameraForward.y(), -cameraForward.z(), 0.0f));
-	//planeModel.setColumn(3, QVector4D(planePosition.x(), planePosition.y(), planePosition.z(), 1.0f));
-	planeModel.setColumn(3, QVector4D(planePosition.x(), planePosition.y(), planePosition.z(), 1));
+	planeModel.setColumn(2, QVector4D(cameraForward.x(), cameraForward.y(), cameraForward.z(), 0.0f));
+	planeModel.setColumn(3, QVector4D(planePosition.x(), planePosition.y(), planePosition.z(), 1.0f));
 	planeMvp = projection * view * planeModel;
 }
 
 void RenderWidget::resetCamera()
 {
-	cameraRotation = QVector2D(36.2972794f, -45.6924248f);
-	cameraPosition = QVector3D(-3.30962682f, -3.19945812f, -3.20841980f);
+	cameraRotation = QVector2D(38.8330460f, -45.5694656f);
+	cameraPosition = QVector3D(-2.71662402f, -2.97333407f, -2.68895960f);
 }
