@@ -2,11 +2,11 @@
 
 3D image visualizer.
 
-## Download
+## Download binaries
 
-Windows: [cellvision-win-0.1.0.zip](https://github.com/mikoro/cellvision/releases/download/v0.1.0/cellvision-win-0.1.0.zip)
+Windows (64-bit): [cellvision-win-0.2.0.zip](https://github.com/mikoro/cellvision/releases/download/v0.2.0/cellvision-win-0.2.0.zip)
 
-Mac OS X: [cellvision-mac-0.1.0.zip](https://github.com/mikoro/cellvision/releases/download/v0.1.0/cellvision-mac-0.1.0.zip)
+Mac OS X (10.9+): [cellvision-mac-0.2.0.zip](https://github.com/mikoro/cellvision/releases/download/v0.2.0/cellvision-mac-0.2.0.zip)
 
 ## Features
 
@@ -18,11 +18,13 @@ Mac OS X: [cellvision-mac-0.1.0.zip](https://github.com/mikoro/cellvision/releas
 - OpenGL rendering widget
 - Image data loading from multipage TIFF files
 - 3D texture sampling and simple rendering
+- Render volume texture as a cube
+- Free camera movement
+- Intersecting plane rendering and volume texture sampling
+- Visualization of boundaries with lines
 
 ### Todo
 
-- Transformation of the "view plane" in some reasonable manner
-- Mac build has not been tested at all
 - ???
 
 ## Build
