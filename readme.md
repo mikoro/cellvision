@@ -4,9 +4,9 @@
 
 ## Download binaries
 
-Windows (64-bit): [cellvision-win-0.2.0.zip](https://github.com/mikoro/cellvision/releases/download/v0.2.0/cellvision-win-0.2.0.zip)
+Windows (64-bit): [cellvision-win-0.2.1.zip](https://github.com/mikoro/cellvision/releases/download/v0.2.1/cellvision-win-0.2.1.zip)
 
-Mac OS X (10.9+): [cellvision-mac-0.2.0.zip](https://github.com/mikoro/cellvision/releases/download/v0.2.0/cellvision-mac-0.2.0.zip)
+Mac OS X (10.9+): [cellvision-mac-0.2.1.zip](https://github.com/mikoro/cellvision/releases/download/v0.2.1/cellvision-mac-0.2.1.zip)
 
 ## Features
 
