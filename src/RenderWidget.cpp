@@ -8,13 +8,6 @@ using namespace CellVision;
 
 RenderWidget::RenderWidget(QWidget* parent) : QOpenGLWidget(parent), volumeTexture(QOpenGLTexture::Target3D)
 {
-	QSurfaceFormat format;
-	format.setSwapInterval(1);
-	format.setSamples(4);
-	//format.setVersion(3, 3);
-	//format.setProfile(QSurfaceFormat::CoreProfile);
-	setFormat(format);
-
 	connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
 }
 
@@ -230,6 +223,7 @@ void RenderWidget::paintGL()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glEnable(GL_MULTISAMPLE);
+	glEnable(GL_LINE_SMOOTH);
 	glLineWidth(4.0f);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

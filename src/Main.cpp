@@ -39,8 +39,12 @@ int main(int argc, char *argv[])
 	QSurfaceFormat format;
 	format.setSwapInterval(1);
 	format.setSamples(4);
-	//format.setVersion(3, 3);
-	//format.setProfile(QSurfaceFormat::CoreProfile);
+	format.setVersion(3, 3);
+#ifndef __APPLE__
+	format.setProfile(QSurfaceFormat::CompatibilityProfile);
+#else
+	format.setProfile(QSurfaceFormat::CoreProfile);
+#endif
 	QSurfaceFormat::setDefaultFormat(format);
 
 	QApplication app(argc, argv);
