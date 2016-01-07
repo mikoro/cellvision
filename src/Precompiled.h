@@ -1,3 +1,6 @@
+// Copyright © 2016 Mikko Ronkainen <firstname@mikkoronkainen.com>
+// License: MIT, see the LICENSE file.
+
 #include <string>
 #include <iostream>
 #include <vector>

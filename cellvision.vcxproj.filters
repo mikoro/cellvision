@@ -44,17 +44,14 @@
     <CustomBuild Include="src\ImageLoader.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="src\MainWindow.ui">
-      <Filter>Form Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="src\MainWindow.qrc">
       <Filter>Resource Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="src\MainWindow.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -62,6 +59,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Precompiled.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="build\GeneratedFiles\ui_MainWindow.h">
@@ -73,9 +73,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="build\GeneratedFiles\Debug\moc_MainWindow.cpp">
@@ -104,6 +101,9 @@
     </ClCompile>
     <ClCompile Include="build\GeneratedFiles\qrc_MainWindow.cpp">
       <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Precompiled.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
