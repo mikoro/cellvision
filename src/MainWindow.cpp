@@ -130,13 +130,13 @@ void MainWindow::on_pushButtonBrowseImageFilePath_clicked()
 	fileDialog.setWindowTitle(tr("Select image file"));
 	fileDialog.setNameFilter(tr("TIFF files (*.tif);;All files (*.*)"));
 
-	if (fileDialog.exec())
-		ui.lineEditImageFilePath->setText(fileDialog.selectedFiles().at(0));
+	//if (fileDialog.exec())
+	//	ui.lineEditImageFilePath->setText(fileDialog.selectedFiles().at(0));
 }
 
 void MainWindow::on_pushButtonLoad_clicked()
 {
-	this->setCursor(Qt::WaitCursor);
+	/*this->setCursor(Qt::WaitCursor);
 
 	std::string filePath = ui.lineEditImageFilePath->text().toStdString();
 	int channelCount = ui.spinBoxChannelCount->value();
@@ -147,7 +147,7 @@ void MainWindow::on_pushButtonLoad_clicked()
 
 	ui.renderWidget->uploadImageData(result);
 
-	this->setCursor(Qt::ArrowCursor);
+	this->setCursor(Qt::ArrowCursor);*/
 }
 
 void MainWindow::resetMouseDelta()
