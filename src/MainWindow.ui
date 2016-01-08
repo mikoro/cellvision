@@ -43,7 +43,7 @@
         <item>
          <widget class="QGroupBox" name="groupBoxTiffImageFileName">
           <property name="title">
-           <string>Tiff image file</string>
+           <string>TIFF image file</string>
           </property>
           <layout class="QGridLayout" name="gridLayout">
            <item row="0" column="0">
@@ -100,6 +100,9 @@
            </item>
            <item row="2" column="2">
             <widget class="QSpinBox" name="spinBoxImagesPerChannel">
+             <property name="minimum">
+              <number>1</number>
+             </property>
              <property name="maximum">
               <number>999999</number>
              </property>
@@ -116,7 +119,7 @@
             <widget class="QPushButton" name="pushButtonLoadFromMetadata">
              <property name="minimumSize">
               <size>
-               <width>110</width>
+               <width>120</width>
                <height>0</height>
               </size>
              </property>
@@ -133,6 +136,9 @@
                <height>16777215</height>
               </size>
              </property>
+             <property name="text">
+              <string>1.0</string>
+             </property>
             </widget>
            </item>
            <item row="2" column="6">
@@ -142,6 +148,9 @@
                <width>200</width>
                <height>16777215</height>
               </size>
+             </property>
+             <property name="text">
+              <string>1.0</string>
              </property>
             </widget>
            </item>
@@ -175,6 +184,9 @@
                <width>200</width>
                <height>16777215</height>
               </size>
+             </property>
+             <property name="text">
+              <string>1.0</string>
              </property>
             </widget>
            </item>
@@ -222,6 +234,9 @@
                <height>0</height>
               </size>
              </property>
+             <property name="minimum">
+              <number>1</number>
+             </property>
              <property name="maximum">
               <number>999999</number>
              </property>
@@ -256,7 +271,7 @@
             <widget class="QPushButton" name="pushButtonLoadAndDisplay">
              <property name="minimumSize">
               <size>
-               <width>110</width>
+               <width>120</width>
                <height>0</height>
               </size>
              </property>
@@ -288,7 +303,7 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>10</width>
+               <width>20</width>
                <height>20</height>
               </size>
              </property>
@@ -517,7 +532,7 @@
             <widget class="QPushButton" name="pushButtonShowFullscreen">
              <property name="minimumSize">
               <size>
-               <width>110</width>
+               <width>120</width>
                <height>0</height>
               </size>
              </property>

@@ -20,6 +20,19 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 	ui.splitterMain->setSizes({ 1000, 1 });
 
 	setFocus();
+
+	updateChannelSelectors();
+
+	connect(ui.checkBoxRedChannelEnabled, SIGNAL(stateChanged(int)), this, SLOT(updateChannelSelectors()));
+	connect(ui.checkBoxGreenChannelEnabled, SIGNAL(stateChanged(int)), this, SLOT(updateChannelSelectors()));
+	connect(ui.checkBoxBlueChannelEnabled, SIGNAL(stateChanged(int)), this, SLOT(updateChannelSelectors()));
+	connect(ui.checkBoxGrayscaleChannelEnabled, SIGNAL(stateChanged(int)), this, SLOT(updateChannelSelectors()));
+
+	pixelValueValidator.setLocale(QLocale::English);
+
+	ui.lineEditPixelWidth->setValidator(&pixelValueValidator);
+	ui.lineEditPixelHeight->setValidator(&pixelValueValidator);
+	ui.lineEditPixelDepth->setValidator(&pixelValueValidator);
 }
 
 Log& MainWindow::getLog()
@@ -77,29 +90,71 @@ bool MainWindow::event(QEvent* event)
 	return QMainWindow::event(event);
 }
 
-void MainWindow::on_pushButtonBrowseImageFilePath_clicked()
+void MainWindow::on_pushButtonBrowseTiffImage_clicked()
 {
 	QFileDialog fileDialog(this);
 	fileDialog.setFileMode(QFileDialog::ExistingFile);
-	fileDialog.setWindowTitle(tr("Select image file"));
+	fileDialog.setWindowTitle(tr("Select TIFF image file"));
 	fileDialog.setNameFilter(tr("TIFF files (*.tif);;All files (*.*)"));
 
-	//if (fileDialog.exec())
-	//	ui.lineEditImageFilePath->setText(fileDialog.selectedFiles().at(0));
+	if (fileDialog.exec())
+		ui.lineEditTiffImageFileName->setText(fileDialog.selectedFiles().at(0));
 }
 
-void MainWindow::on_pushButtonLoad_clicked()
+void MainWindow::on_pushButtonBrowseMetadataFile_clicked()
 {
-	/*this->setCursor(Qt::WaitCursor);
+	QFileDialog fileDialog(this);
+	fileDialog.setFileMode(QFileDialog::ExistingFile);
+	fileDialog.setWindowTitle(tr("Select metadata file"));
+	fileDialog.setNameFilter(tr("Text files (*.txt);;All files (*.*)"));
 
-	std::string filePath = ui.lineEditImageFilePath->text().toStdString();
-	int channelCount = ui.spinBoxChannelCount->value();
-	int imagesPerChannel = ui.spinBoxImagesPerChannel->value();
-	int selectedChannel = ui.spinBoxSelectedChannel->value();
+	if (fileDialog.exec())
+		ui.lineEditMetadataFileName->setText(fileDialog.selectedFiles().at(0));
+}
 
-	ImageLoaderResult result = ImageLoader::loadFromMultipageTiff(filePath, channelCount, imagesPerChannel, selectedChannel);
+void MainWindow::on_pushButtonLoadFromMetadata_clicked()
+{
+	
+}
 
-	ui.renderWidget->uploadImageData(result);
+void MainWindow::on_pushButtonLoadAndDisplay_clicked()
+{
+	this->setCursor(Qt::WaitCursor);
 
-	this->setCursor(Qt::ArrowCursor);*/
+	std::string filePath = ui.lineEditTiffImageFileName->text().toStdString();
+
+	//ImageLoaderResult result = ImageLoader::loadFromMultipageTiff(filePath, channelCount, imagesPerChannel, selectedChannel);
+	//ui.renderWidget->uploadImageData(result);
+
+	this->setCursor(Qt::ArrowCursor);
+}
+
+void MainWindow::on_pushButtonShowFullscreen_clicked()
+{
+}
+
+void MainWindow::updateChannelSelectors()
+{
+	if (ui.checkBoxGrayscaleChannelEnabled->isChecked())
+	{
+		ui.checkBoxRedChannelEnabled->setEnabled(false);
+		ui.checkBoxGreenChannelEnabled->setEnabled(false);
+		ui.checkBoxBlueChannelEnabled->setEnabled(false);
+
+		ui.spinBoxRedChannel->setEnabled(false);
+		ui.spinBoxGreenChannel->setEnabled(false);
+		ui.spinBoxBlueChannel->setEnabled(false);
+		ui.spinBoxGrayscaleChannel->setEnabled(true);
+	}
+	else
+	{
+		ui.checkBoxRedChannelEnabled->setEnabled(true);
+		ui.checkBoxGreenChannelEnabled->setEnabled(true);
+		ui.checkBoxBlueChannelEnabled->setEnabled(true);
+
+		ui.spinBoxRedChannel->setEnabled(ui.checkBoxRedChannelEnabled->isChecked());
+		ui.spinBoxGreenChannel->setEnabled(ui.checkBoxGreenChannelEnabled->isChecked());
+		ui.spinBoxBlueChannel->setEnabled(ui.checkBoxBlueChannelEnabled->isChecked());
+		ui.spinBoxGrayscaleChannel->setEnabled(false);
+	}
 }

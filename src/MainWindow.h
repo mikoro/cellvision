@@ -29,12 +29,19 @@ namespace CellVision
 
 	private slots:
 
-		void on_pushButtonBrowseImageFilePath_clicked();
-		void on_pushButtonLoad_clicked();
+		void on_pushButtonBrowseTiffImage_clicked();
+		void on_pushButtonBrowseMetadataFile_clicked();
+		void on_pushButtonLoadFromMetadata_clicked();
+		void on_pushButtonLoadAndDisplay_clicked();
+		void on_pushButtonShowFullscreen_clicked();
+
+		void updateChannelSelectors();
 
 	private:
 
 		Ui::MainWindowClass ui;
+
+		QDoubleValidator pixelValueValidator;
 
 		static std::map<int, bool> keyMap;
 		static std::map<int, bool> keyMapOnce;
