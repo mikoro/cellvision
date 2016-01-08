@@ -54,7 +54,7 @@ namespace CellVision
 		QOpenGLBuffer cubeVbo;
 		QOpenGLVertexArrayObject cubeVao;
 		QOpenGLShaderProgram cubeProgram;
-		QMatrix4x4 cubeModel;
+		QMatrix4x4 cubeModelMatrix;
 		QMatrix4x4 cubeMvp;
 
 		QOpenGLBuffer cubeLinesVbo;
@@ -64,7 +64,7 @@ namespace CellVision
 		QOpenGLBuffer planeVbo;
 		QOpenGLVertexArrayObject planeVao;
 		QOpenGLShaderProgram planeProgram;
-		QMatrix4x4 planeModel;
+		QMatrix4x4 planeModelMatrix;
 		QMatrix4x4 planeMvp;
 
 		QOpenGLBuffer planeLinesVbo;
@@ -72,6 +72,8 @@ namespace CellVision
 		QOpenGLShaderProgram planeLinesProgram;
 
 		QVector3D cameraPosition;
-		QVector2D cameraRotation;
+		QMatrix4x4 viewMatrix;
+
+		float moveSpeedModifier = 1.0f;
 	};
 }

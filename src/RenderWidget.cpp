@@ -284,10 +284,10 @@ void RenderWidget::paintGL()
 		volumeTexture.bind();
 
 	planeProgram.setUniformValue("texture0", 0);
-	planeProgram.setUniformValue("model", planeModel);
+	planeProgram.setUniformValue("model", planeModelMatrix);
 	planeProgram.setUniformValue("mvp", planeMvp);
 
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	//glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	if (volumeTexture.isCreated())
 		volumeTexture.release();
@@ -303,7 +303,7 @@ void RenderWidget::paintGL()
 	planeLinesProgram.setUniformValue("lineColor", QVector4D(1.0f, 1.0f, 1.0f, 0.5f));
 	planeLinesProgram.setUniformValue("mvp", planeMvp);
 
-	glDrawArrays(GL_LINES, 0, 8);
+	//glDrawArrays(GL_LINES, 0, 8);
 
 	planeLinesVao.release();
 	planeLinesProgram.release();
@@ -314,18 +314,13 @@ void RenderWidget::updateLogic()
 	float timeStep = timeStepTimer.nsecsElapsed() / 1000000000.0f;
 	timeStepTimer.restart();
 
-	QMatrix4x4 view;
-	view.setToIdentity();
-	view.rotate(cameraRotation[0], QVector3D(1, 0, 0));
-	view.rotate(cameraRotation[1], QVector3D(0, 1, 0));
-	view.translate(cameraPosition);
+	if (MainWindow::keyIsDown(Qt::Key_PageUp))
+		moveSpeedModifier *= 1.05f;
 
-	QMatrix4x4 projection;
-	projection.setToIdentity();
-	float aspectRatio = float(width()) / float(height());
-	projection.perspective(45.0f, aspectRatio, 0.1f, 100.0f);
+	if (MainWindow::keyIsDown(Qt::Key_PageDown))
+		moveSpeedModifier *= 0.95f;
 
-	float moveSpeed = 0.6f;
+	float moveSpeed = 0.5f * moveSpeedModifier;
 
 	if (MainWindow::keyIsDown(Qt::Key_Shift))
 		moveSpeed *= 2.0f;
@@ -336,46 +331,49 @@ void RenderWidget::updateLogic()
 	if (MainWindow::keyIsDown(Qt::Key_R))
 		resetCamera();
 
-	//cameraRotation[0] += MainWindow::getMouseDelta().y() * 4.0f * timeStep;
-	//cameraRotation[1] += MainWindow::getMouseDelta().x() * 4.0f * timeStep;
+	QVector3D cameraRight = viewMatrix.column(0).toVector3D();
+	QVector3D cameraUp = viewMatrix.column(1).toVector3D();
+	QVector3D cameraForward = -viewMatrix.column(2).toVector3D();
 
-	QVector3D cameraForward = -view.row(2).toVector3D().normalized();
-	QVector3D cameraRight = view.row(0).toVector3D().normalized();
-	QVector3D cameraUp = view.row(1).toVector3D().normalized();
-
-	if (MainWindow::keyIsDown(Qt::Key_W))
-		cameraPosition -= cameraForward * moveSpeed * timeStep;
-
-	if (MainWindow::keyIsDown(Qt::Key_S))
+	if (MainWindow::keyIsDown(Qt::Key_W) || MainWindow::keyIsDown(Qt::Key_Up))
 		cameraPosition += cameraForward * moveSpeed * timeStep;
 
-	if (MainWindow::keyIsDown(Qt::Key_D))
-		cameraPosition -= cameraRight * moveSpeed * timeStep;
+	if (MainWindow::keyIsDown(Qt::Key_S) || MainWindow::keyIsDown(Qt::Key_Down))
+		cameraPosition -= cameraForward * moveSpeed * timeStep;
 
-	if (MainWindow::keyIsDown(Qt::Key_A))
+	if (MainWindow::keyIsDown(Qt::Key_D) || MainWindow::keyIsDown(Qt::Key_Right))
 		cameraPosition += cameraRight * moveSpeed * timeStep;
 
-	if (MainWindow::keyIsDown(Qt::Key_E))
-		cameraPosition -= cameraUp * moveSpeed * timeStep;
+	if (MainWindow::keyIsDown(Qt::Key_A) || MainWindow::keyIsDown(Qt::Key_Left))
+		cameraPosition -= cameraRight * moveSpeed * timeStep;
 
-	if (MainWindow::keyIsDown(Qt::Key_Q))
+	if (MainWindow::keyIsDown(Qt::Key_E))
 		cameraPosition += cameraUp * moveSpeed * timeStep;
 
-	cubeModel.setToIdentity();
-	cubeMvp = projection * view * cubeModel;
+	if (MainWindow::keyIsDown(Qt::Key_Q))
+		cameraPosition -= cameraUp * moveSpeed * timeStep;
+
+	viewMatrix.setColumn(3, QVector4D(-cameraPosition.x(), -cameraPosition.y(), -cameraPosition.z(), 1.0f));
+
+	QMatrix4x4 projectionMatrix;
+	projectionMatrix.setToIdentity();
+	float aspectRatio = float(width()) / float(height());
+	projectionMatrix.perspective(45.0f, aspectRatio, 0.1f, 100.0f);
+
+	cubeModelMatrix.setToIdentity();
+	cubeMvp = projectionMatrix * viewMatrix * cubeModelMatrix;
 
 	QVector3D planePosition = -cameraPosition + 3.0f * cameraForward;
 
-	planeModel.setToIdentity();
-	planeModel.setColumn(0, QVector4D(cameraRight.x(), cameraRight.y(), cameraRight.z(), 0.0f));
-	planeModel.setColumn(1, QVector4D(cameraUp.x(), cameraUp.y(), cameraUp.z(), 0.0f));
-	planeModel.setColumn(2, QVector4D(cameraForward.x(), cameraForward.y(), cameraForward.z(), 0.0f));
-	planeModel.setColumn(3, QVector4D(planePosition.x(), planePosition.y(), planePosition.z(), 1.0f));
-	planeMvp = projection * view * planeModel;
+	planeModelMatrix.setToIdentity();
+	planeModelMatrix.setColumn(0, QVector4D(cameraRight.x(), cameraRight.y(), cameraRight.z(), 0.0f));
+	planeModelMatrix.setColumn(1, QVector4D(cameraUp.x(), cameraUp.y(), cameraUp.z(), 0.0f));
+	planeModelMatrix.setColumn(2, QVector4D(cameraForward.x(), cameraForward.y(), cameraForward.z(), 0.0f));
+	planeModelMatrix.setColumn(3, QVector4D(planePosition.x(), planePosition.y(), planePosition.z(), 1.0f));
+	planeMvp = projectionMatrix * viewMatrix * planeModelMatrix;
 }
 
 void RenderWidget::resetCamera()
 {
-	cameraRotation = QVector2D(38.8330460f, -45.5694656f);
-	cameraPosition = QVector3D(-2.71662402f, -2.97333407f, -2.68895960f);
+	cameraPosition = QVector3D(0.0f, 0.0f, 0.0f);
 }
