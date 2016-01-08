@@ -9,12 +9,12 @@
 
 using namespace CellVision;
 
-ImageLoaderResult ImageLoader::loadFromMultipageTiff(const std::string& filePath, int channelCount, int imagesPerChannel, int selectedChannel)
+ImageLoaderResult ImageLoader::loadFromMultipageTiff(const std::string& fileName, int channelCount, int imagesPerChannel, int selectedChannel)
 {
 	Log& log = MainWindow::getLog();
-	log.logInfo("Loading multipage TIFF image from %s", filePath);
+	log.logInfo("Loading multipage TIFF image from %s", fileName);
 
-	TIFF* tiffFile = TIFFOpen(filePath.c_str(), "r");
+	TIFF* tiffFile = TIFFOpen(fileName.c_str(), "r");
 
 	if (tiffFile == nullptr)
 	{

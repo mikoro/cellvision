@@ -6,6 +6,7 @@
 #include "MainWindow.h"
 #include "Log.h"
 #include "ImageLoader.h"
+#include "MetadataLoader.h"
 
 using namespace CellVision;
 
@@ -114,16 +115,30 @@ void MainWindow::on_pushButtonBrowseMetadataFile_clicked()
 
 void MainWindow::on_pushButtonLoadFromMetadata_clicked()
 {
+	this->setCursor(Qt::WaitCursor);
+
+	std::string fileName = ui.lineEditMetadataFileName->text().toStdString();
+
+	MetadataLoaderResult result = MetadataLoader::loadFromFile(fileName);
 	
+	QLocale locale(QLocale::English);
+
+	ui.spinBoxChannelCount->setValue(result.channelCount);
+	ui.spinBoxImagesPerChannel->setValue(result.imagesPerChannel);
+	ui.lineEditPixelWidth->setText(locale.toString(result.pixelWidth));
+	ui.lineEditPixelHeight->setText(locale.toString(result.pixelHeight));
+	ui.lineEditPixelDepth->setText(locale.toString(result.pixelDepth));
+
+	this->setCursor(Qt::ArrowCursor);
 }
 
 void MainWindow::on_pushButtonLoadAndDisplay_clicked()
 {
 	this->setCursor(Qt::WaitCursor);
 
-	std::string filePath = ui.lineEditTiffImageFileName->text().toStdString();
+	std::string fileName = ui.lineEditTiffImageFileName->text().toStdString();
 
-	//ImageLoaderResult result = ImageLoader::loadFromMultipageTiff(filePath, channelCount, imagesPerChannel, selectedChannel);
+	ImageLoaderResult result = ImageLoader::loadFromMultipageTiff(fileName, 0, 0, 0);
 	//ui.renderWidget->uploadImageData(result);
 
 	this->setCursor(Qt::ArrowCursor);

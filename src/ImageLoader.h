@@ -21,6 +21,6 @@ namespace CellVision
 		
 	public:
 
-		static ImageLoaderResult loadFromMultipageTiff(const std::string& filePath, int channelCount, int imagesPerChannel, int selectedChannel);
+		static ImageLoaderResult loadFromMultipageTiff(const std::string& fileName, int channelCount, int imagesPerChannel, int selectedChannel);
 	};
 }
