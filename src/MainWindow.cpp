@@ -11,7 +11,6 @@ using namespace CellVision;
 
 std::map<int, bool> MainWindow::keyMap;
 std::map<int, bool> MainWindow::keyMapOnce;
-QVector4D MainWindow::mouseDelta;
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 {
@@ -19,13 +18,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 
 	resize(1280, 1000);
 	ui.splitterMain->setSizes({ 1000, 1 });
-
-	ui.renderWidget->setUI(&ui);
-
-	resetMouseDeltaTimer.setInterval(100);
-	resetMouseDeltaTimer.setSingleShot(true);
-
-	connect(&resetMouseDeltaTimer, SIGNAL(timeout()), this, SLOT(resetMouseDelta()));
 
 	setFocus();
 }
@@ -58,11 +50,6 @@ bool MainWindow::keyIsDownOnce(int key)
 	return false;
 }
 
-QVector4D MainWindow::getMouseDelta()
-{
-	return mouseDelta;
-}
-
 bool MainWindow::event(QEvent* event)
 {
 	if (event->type() == QEvent::KeyPress)
@@ -85,39 +72,6 @@ bool MainWindow::event(QEvent* event)
 			keyMap[ke->key()] = false;
 			keyMapOnce[ke->key()] = false;
 		}
-	}
-
-	if (event->type() == QEvent::MouseMove)
-	{
-		QMouseEvent* me = static_cast<QMouseEvent*>(event);
-
-		if (me->buttons() == Qt::LeftButton)
-		{
-			QPoint tempDelta = me->globalPos() - lastMousePosition;
-			mouseDelta.setX(tempDelta.x());
-			mouseDelta.setY(tempDelta.y());
-		}
-
-		lastMousePosition = me->globalPos();
-		resetMouseDeltaTimer.start();
-	}
-
-	if (event->type() == QEvent::Wheel)
-	{
-		QWheelEvent* we = static_cast<QWheelEvent*>(event);
-
-		mouseDelta.setZ(we->angleDelta().x() / 120.0);
-		mouseDelta.setW(we->angleDelta().y() / 120.0);
-
-		resetMouseDeltaTimer.start();
-	}
-
-	if (event->type() == QEvent::MouseButtonRelease)
-	{
-		mouseDelta.setX(0.0f);
-		mouseDelta.setY(0.0f);
-		mouseDelta.setZ(0.0f);
-		mouseDelta.setW(0.0f);
 	}
 
 	return QMainWindow::event(event);
@@ -148,12 +102,4 @@ void MainWindow::on_pushButtonLoad_clicked()
 	ui.renderWidget->uploadImageData(result);
 
 	this->setCursor(Qt::ArrowCursor);*/
-}
-
-void MainWindow::resetMouseDelta()
-{
-	mouseDelta.setX(0.0f);
-	mouseDelta.setY(0.0f);
-	mouseDelta.setZ(0.0f);
-	mouseDelta.setW(0.0f);
 }

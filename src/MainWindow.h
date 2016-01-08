@@ -5,8 +5,6 @@
 
 #include <map>
 
-#include <QTimer>
-
 #include "ui_MainWindow.h"
 
 namespace CellVision
@@ -24,7 +22,6 @@ namespace CellVision
 		static Log& getLog();
 		static bool keyIsDown(int key);
 		static bool keyIsDownOnce(int key);
-		static QVector4D getMouseDelta();
 
 	protected:
 
@@ -34,7 +31,6 @@ namespace CellVision
 
 		void on_pushButtonBrowseImageFilePath_clicked();
 		void on_pushButtonLoad_clicked();
-		void resetMouseDelta();
 
 	private:
 
@@ -42,9 +38,5 @@ namespace CellVision
 
 		static std::map<int, bool> keyMap;
 		static std::map<int, bool> keyMapOnce;
-		static QVector4D mouseDelta;
-
-		QPoint lastMousePosition;
-		QTimer resetMouseDeltaTimer;
 	};
 }

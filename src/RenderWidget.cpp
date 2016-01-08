@@ -14,11 +14,6 @@ RenderWidget::RenderWidget(QWidget* parent) : QOpenGLWidget(parent), volumeTextu
 	connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
 }
 
-void RenderWidget::setUI(Ui::MainWindowClass* ui_)
-{
-	ui = ui_;
-}
-
 void RenderWidget::uploadImageData(const ImageLoaderResult& result)
 {
 	volumeTexture.destroy();
@@ -35,14 +30,30 @@ void RenderWidget::uploadImageData(const ImageLoaderResult& result)
 	volumeTexture.release();
 }
 
-bool RenderWidget::event(QEvent* event)
+void RenderWidget::mousePressEvent(QMouseEvent* me)
 {
-	if (event->type() == QEvent::MouseButtonPress)
-	{
-		setFocus();
-	}
+	//setFocus();
 
-	return QOpenGLWidget::event(event);
+	previousMousePosition = me->globalPos();
+
+	me->accept();
+}
+
+void RenderWidget::mouseMoveEvent(QMouseEvent* me)
+{
+	QPoint mouseDelta = me->globalPos() - previousMousePosition;
+	previousMousePosition = me->globalPos();
+
+	tfm::printfln("x: %d y: %d", mouseDelta.x(), mouseDelta.y());
+
+	me->accept();
+}
+
+void RenderWidget::wheelEvent(QWheelEvent* we)
+{
+	tfm::printfln("x: %f y: %f", we->angleDelta().x() / 120.0, we->angleDelta().y() / 120.0);
+
+	we->accept();
 }
 
 void RenderWidget::initializeGL()
@@ -209,7 +220,7 @@ void RenderWidget::initializeGL()
 
 	// MISC //
 
-	timer.start();
+	timeStepTimer.start();
 	resetCamera();
 }
 
@@ -300,8 +311,8 @@ void RenderWidget::paintGL()
 
 void RenderWidget::updateLogic()
 {
-	float timeStep = timer.nsecsElapsed() / 1000000000.0f;
-	timer.restart();
+	float timeStep = timeStepTimer.nsecsElapsed() / 1000000000.0f;
+	timeStepTimer.restart();
 
 	QMatrix4x4 view;
 	view.setToIdentity();
@@ -311,7 +322,7 @@ void RenderWidget::updateLogic()
 
 	QMatrix4x4 projection;
 	projection.setToIdentity();
-	float aspectRatio = float(ui->renderWidget->width()) / float(ui->renderWidget->height());
+	float aspectRatio = float(width()) / float(height());
 	projection.perspective(45.0f, aspectRatio, 0.1f, 100.0f);
 
 	float moveSpeed = 0.6f;
@@ -325,8 +336,8 @@ void RenderWidget::updateLogic()
 	if (MainWindow::keyIsDown(Qt::Key_R))
 		resetCamera();
 
-	cameraRotation[0] += MainWindow::getMouseDelta().y() * 4.0f * timeStep;
-	cameraRotation[1] += MainWindow::getMouseDelta().x() * 4.0f * timeStep;
+	//cameraRotation[0] += MainWindow::getMouseDelta().y() * 4.0f * timeStep;
+	//cameraRotation[1] += MainWindow::getMouseDelta().x() * 4.0f * timeStep;
 
 	QVector3D cameraForward = -view.row(2).toVector3D().normalized();
 	QVector3D cameraRight = view.row(0).toVector3D().normalized();

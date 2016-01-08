@@ -28,12 +28,14 @@ namespace CellVision
 
 		explicit RenderWidget(QWidget* parent = nullptr);
 		
-		void setUI(Ui::MainWindowClass* ui);
 		void uploadImageData(const ImageLoaderResult& result);
 
 	protected:
 
-		bool event(QEvent* event) override;
+		void mousePressEvent(QMouseEvent* me) override;
+		void mouseMoveEvent(QMouseEvent* me) override;
+		void wheelEvent(QWheelEvent* we) override;
+
 		void initializeGL() override;
 		void resizeGL(int width, int height) override;
 		void paintGL() override;
@@ -43,9 +45,9 @@ namespace CellVision
 		void updateLogic();
 		void resetCamera();
 
-		Ui::MainWindowClass* ui = nullptr;
+		QPoint previousMousePosition;
 
-		QElapsedTimer timer;
+		QElapsedTimer timeStepTimer;
 
 		QOpenGLTexture volumeTexture;
 
