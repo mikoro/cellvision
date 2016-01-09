@@ -396,17 +396,17 @@ void RenderWidget::updateLogic()
 	float timeStep = timeStepTimer.nsecsElapsed() / 1000000000.0f;
 	timeStepTimer.restart();
 
-	if (keyboardHelper.keyIsDown(Qt::Key_PageUp))
-		moveSpeedModifier *= 1.05f;
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_PageUp))
+		moveSpeedModifier *= 2.0f;
 
-	if (keyboardHelper.keyIsDown(Qt::Key_PageDown))
-		moveSpeedModifier *= 0.95f;
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_PageDown))
+		moveSpeedModifier *= 0.5f;
 
-	if (keyboardHelper.keyIsDown(Qt::Key_Home))
-		mouseSpeedModifier *= 1.05f;
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_Home))
+		mouseSpeedModifier *= 2.0f;
 
-	if (keyboardHelper.keyIsDown(Qt::Key_End))
-		mouseSpeedModifier *= 0.95f;
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_End))
+		mouseSpeedModifier *= 0.5f;
 
 	float moveSpeed = 0.5f * moveSpeedModifier;
 
