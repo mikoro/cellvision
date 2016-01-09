@@ -13,9 +13,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
 
-	resize(1280, 1000);
-	ui.splitterMain->setSizes({ 1000, 1 });
-
 	QLocale locale(QLocale::English);
 
 	doubleValueValidator.setLocale(locale);
@@ -25,6 +22,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 	ui.lineEditImageDepth->setValidator(&doubleValueValidator);
 
 	QSettings settings;
+
+	resize(settings.value("windowSize", QSize(1280, 1000)).toSize());
+	ui.splitterMain->setSizes({ 1000, 1 });
 
 	ui.lineEditTiffImageFileName->setText(settings.value("tiffImageFileName", "").toString());
 	ui.lineEditMetadataFileName->setText(settings.value("metadataFileName", "").toString());
@@ -69,6 +69,7 @@ void MainWindow::closeEvent(QCloseEvent* ce)
 {
 	QSettings settings;
 
+	settings.setValue("windowSize", this->size());
 	settings.setValue("tiffImageFileName", ui.lineEditTiffImageFileName->text());
 	settings.setValue("metadataFileName", ui.lineEditMetadataFileName->text());
 	settings.setValue("channelCount", ui.spinBoxChannelCount->value());
