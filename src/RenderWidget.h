@@ -40,9 +40,6 @@ namespace CellVision
 		float imageWidth = 1.0f;
 		float imageHeight = 1.0f;
 		float imageDepth = 1.0f;
-		float moveSpeed = 1.0f;
-		float mouseSpeed = 0.25f;
-		bool renderCoordinates = true;
 	};
 
 	class RenderWidget : public QOpenGLWidget, protected QOpenGLFunctions
@@ -82,13 +79,16 @@ namespace CellVision
 		QVector3D cameraPosition;
 		QVector2D cameraRotation;
 		QMatrix4x4 cameraMatrix;
+		float moveSpeedModifier = 1.0f;
+		float mouseSpeedModifier = 0.25f;
+		float planeDistance = 1.0f;
+		bool renderCoordinates = true;
 
 		QOpenGLTexture volumeTexture;
 
 		OpenGLData cube;
 		OpenGLData cubeLines;
 		OpenGLData plane;
-		OpenGLData planeLines;
 		OpenGLData coordinateLines;
 	};
 }

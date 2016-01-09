@@ -76,7 +76,7 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 	QPoint mouseDelta = me->globalPos() - previousMousePosition;
 	previousMousePosition = me->globalPos();
 
-	cameraRotation += QVector2D(-mouseDelta.x(), -mouseDelta.y()) * settings.mouseSpeed;
+	cameraRotation += QVector2D(-mouseDelta.x(), -mouseDelta.y()) * mouseSpeedModifier;
 
 	QMatrix4x4 rotateYaw;
 	QMatrix4x4 rotatePitch;
@@ -97,7 +97,15 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 
 void RenderWidget::wheelEvent(QWheelEvent* we)
 {
-	//tfm::printfln("x: %f y: %f", we->angleDelta().x() / 120.0, we->angleDelta().y() / 120.0);
+	float moveSpeed = moveSpeedModifier;
+
+	if (keyboardHelper.keyIsDown(Qt::Key_Shift))
+		moveSpeed *= 2.0f;
+
+	if (keyboardHelper.keyIsDown(Qt::Key_Control))
+		moveSpeed *= 0.5f;
+
+	planeDistance += we->angleDelta().y() / 120.0f * 0.05f * moveSpeed;
 
 	we->accept();
 }
@@ -161,10 +169,10 @@ void RenderWidget::initializeGL()
 
 	// PLANE //
 
-	QVector3D v1(-1, -1, 0);
-	QVector3D v2(1, -1, 0);
-	QVector3D v3(-1, 1, 0);
-	QVector3D v4(1, 1, 0);
+	QVector3D v1(-10, -10, 0);
+	QVector3D v2(10, -10, 0);
+	QVector3D v3(-10, 10, 0);
+	QVector3D v4(10, 10, 0);
 
 	const QVector3D planeVertexData[] =
 	{
@@ -191,36 +199,6 @@ void RenderWidget::initializeGL()
 	plane.vao.release();
 	plane.vbo.release();
 	plane.program.release();
-
-	// PLANE LINES //
-
-	const QVector3D planeLinesVertexData[] =
-	{
-		v1, v2,
-		v2, v4,
-		v4, v3,
-		v3, v1
-	};
-
-	planeLines.program.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/lines.vert");
-	planeLines.program.addShaderFromSourceFile(QOpenGLShader::Fragment, "data/shaders/lines.frag");
-	planeLines.program.link();
-	planeLines.program.bind();
-
-	planeLines.vbo.create();
-	planeLines.vbo.bind();
-	planeLines.vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-	planeLines.vbo.allocate(planeLinesVertexData, sizeof(planeLinesVertexData));
-
-	planeLines.vao.create();
-	planeLines.vao.bind();
-
-	planeLines.program.enableAttributeArray("position");
-	planeLines.program.setAttributeBuffer("position", GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
-
-	planeLines.vao.release();
-	planeLines.vbo.release();
-	planeLines.program.release();
 
 	// COORDINATE LINES //
 
@@ -289,7 +267,7 @@ void RenderWidget::paintGL()
 
 	// COORDINATE LINES //
 
-	if (settings.renderCoordinates)
+	if (renderCoordinates)
 	{
 		coordinateLines.program.bind();
 		coordinateLines.vao.bind();
@@ -350,26 +328,13 @@ void RenderWidget::paintGL()
 	plane.program.setUniformValue("modelMatrix", plane.modelMatrix);
 	plane.program.setUniformValue("mvp", plane.mvp);
 
-	//glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	if (volumeTexture.isCreated())
 		volumeTexture.release();
 
 	plane.vao.release();
 	plane.program.release();
-
-	// PLANE LINES //
-
-	planeLines.program.bind();
-	planeLines.vao.bind();
-
-	planeLines.program.setUniformValue("lineColor", QVector4D(1.0f, 1.0f, 1.0f, 0.5f));
-	planeLines.program.setUniformValue("mvp", plane.mvp);
-
-	//glDrawArrays(GL_LINES, 0, 8);
-
-	planeLines.vao.release();
-	planeLines.program.release();
 }
 
 void RenderWidget::generateCubeVertices(std::array<QVector3D, 72>& cubeVertexData, std::array<QVector3D, 24>& cubeLinesVertexData, float width, float height, float depth)
@@ -439,18 +404,18 @@ void RenderWidget::updateLogic()
 	timeStepTimer.restart();
 
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_PageUp))
-		settings.moveSpeed *= 2.0f;
+		moveSpeedModifier *= 2.0f;
 
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_PageDown))
-		settings.moveSpeed *= 0.5f;
+		moveSpeedModifier *= 0.5f;
 
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_Home))
-		settings.moveSpeed *= 2.0f;
+		moveSpeedModifier *= 2.0f;
 
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_End))
-		settings.moveSpeed *= 0.5f;
+		moveSpeedModifier *= 0.5f;
 
-	float moveSpeed = settings.moveSpeed;
+	float moveSpeed = moveSpeedModifier;
 
 	if (keyboardHelper.keyIsDown(Qt::Key_Shift))
 		moveSpeed *= 2.0f;
@@ -462,7 +427,7 @@ void RenderWidget::updateLogic()
 		resetCamera();
 
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_C))
-		settings.renderCoordinates = !settings.renderCoordinates;
+		renderCoordinates = !renderCoordinates;
 
 	QVector3D cameraRight = cameraMatrix.column(0).toVector3D();
 	QVector3D cameraUp = cameraMatrix.column(1).toVector3D();
@@ -499,7 +464,7 @@ void RenderWidget::updateLogic()
 	cube.modelMatrix.setToIdentity();
 	cube.mvp = projectionMatrix * viewMatrix * cube.modelMatrix;
 
-	QVector3D planePosition = -cameraPosition + 3.0f * cameraForward;
+	QVector3D planePosition = cameraPosition + planeDistance * cameraForward;
 
 	plane.modelMatrix.setToIdentity();
 	plane.modelMatrix.setColumn(0, QVector4D(cameraRight.x(), cameraRight.y(), cameraRight.z(), 0.0f));
@@ -514,7 +479,8 @@ void RenderWidget::updateLogic()
 
 void RenderWidget::resetCamera()
 {
-	cameraPosition = QVector3D(0.5f, 0.5f, 3.0f);
+	cameraPosition = QVector3D(0.5f, 0.5f, 2.3f);
 	cameraRotation = QVector2D(0.0f, 0.0f);
+	planeDistance = 1.8f;
 	cameraMatrix.setToIdentity();
 }
