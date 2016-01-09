@@ -267,8 +267,24 @@
            <string>Data visualization</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_4">
+           <item row="0" column="3">
+            <spacer name="horizontalSpacer_5">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>10</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
            <item row="0" column="10">
-            <widget class="QPushButton" name="pushButtonLoadAndDisplay">
+            <widget class="QPushButton" name="pushButtonLoadWindowed">
              <property name="minimumSize">
               <size>
                <width>120</width>
@@ -276,18 +292,21 @@
               </size>
              </property>
              <property name="text">
-              <string>Load &amp;&amp; display</string>
+              <string>Load windowed</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="9">
-            <spacer name="horizontalSpacer_3">
+           <item row="0" column="5">
+            <spacer name="horizontalSpacer_6">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>40</width>
+               <width>10</width>
                <height>20</height>
               </size>
              </property>
@@ -309,37 +328,25 @@
              </property>
             </spacer>
            </item>
-           <item row="0" column="3">
-            <spacer name="horizontalSpacer_5">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+           <item row="0" column="6">
+            <widget class="QLabel" name="label_11">
+             <property name="text">
+              <string>Blue</string>
              </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
              </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>10</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
+            </widget>
            </item>
-           <item row="0" column="5">
-            <spacer name="horizontalSpacer_6">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+           <item row="0" column="4">
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>Green</string>
              </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
              </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>10</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
+            </widget>
            </item>
            <item row="0" column="7">
             <spacer name="horizontalSpacer_7">
@@ -352,6 +359,29 @@
              <property name="sizeHint" stdset="0">
               <size>
                <width>10</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="8">
+            <widget class="QLabel" name="label_12">
+             <property name="text">
+              <string>Grayscale</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="9">
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
                <height>20</height>
               </size>
              </property>
@@ -390,80 +420,6 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="6">
-            <widget class="QLabel" name="label_11">
-             <property name="text">
-              <string>Blue</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="4">
-            <widget class="QLabel" name="label_10">
-             <property name="text">
-              <string>Green</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="8">
-            <widget class="QLabel" name="label_12">
-             <property name="text">
-              <string>Grayscale</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="2">
-            <widget class="QCheckBox" name="checkBoxRedChannelEnabled">
-             <property name="styleSheet">
-              <string notr="true">padding-left: 30px</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="4">
-            <widget class="QCheckBox" name="checkBoxGreenChannelEnabled">
-             <property name="styleSheet">
-              <string notr="true">padding-left: 30px</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="6">
-            <widget class="QCheckBox" name="checkBoxBlueChannelEnabled">
-             <property name="styleSheet">
-              <string notr="true">padding-left: 30px</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_6">
-             <property name="text">
-              <string>Color</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_7">
-             <property name="text">
-              <string>Channel</string>
-             </property>
-            </widget>
-           </item>
            <item row="1" column="2">
             <widget class="QSpinBox" name="spinBoxRedChannel">
              <property name="minimumSize">
@@ -493,6 +449,13 @@
              </property>
              <property name="maximum">
               <number>999999</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>Channel</string>
              </property>
             </widget>
            </item>
@@ -528,8 +491,15 @@
              </property>
             </widget>
            </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>Color</string>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="10">
-            <widget class="QPushButton" name="pushButtonShowFullscreen">
+            <widget class="QPushButton" name="pushButtonLoadFullscreen">
              <property name="minimumSize">
               <size>
                <width>120</width>
@@ -537,9 +507,103 @@
               </size>
              </property>
              <property name="text">
-              <string>Show fullscreen</string>
+              <string>Load fullscreen</string>
              </property>
             </widget>
+           </item>
+           <item row="3" column="2">
+            <widget class="QCheckBox" name="checkBoxRedChannelEnabled">
+             <property name="styleSheet">
+              <string notr="true">padding-left: 30px</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="6">
+            <widget class="QCheckBox" name="checkBoxBlueChannelEnabled">
+             <property name="styleSheet">
+              <string notr="true">padding-left: 30px</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="4">
+            <widget class="QCheckBox" name="checkBoxGreenChannelEnabled">
+             <property name="styleSheet">
+              <string notr="true">padding-left: 30px</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="2">
+            <widget class="QFrame" name="frameBackgroundColor">
+             <property name="frameShape">
+              <enum>QFrame::Box</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_13">
+             <property name="text">
+              <string>Background color:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_14">
+             <property name="text">
+              <string>Line color:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="4">
+            <widget class="QPushButton" name="pushButtonPickBackgroundColor">
+             <property name="text">
+              <string>Pick</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="2">
+            <widget class="QFrame" name="frameLineColor">
+             <property name="frameShape">
+              <enum>QFrame::Box</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="4">
+            <widget class="QPushButton" name="pushButtonPickLineColor">
+             <property name="text">
+              <string>Pick</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>10</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>

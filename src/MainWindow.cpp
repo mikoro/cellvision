@@ -132,7 +132,7 @@ void MainWindow::on_pushButtonLoadFromMetadata_clicked()
 	this->setCursor(Qt::ArrowCursor);
 }
 
-void MainWindow::on_pushButtonLoadAndDisplay_clicked()
+void MainWindow::on_pushButtonLoadWindowed_clicked()
 {
 	this->setCursor(Qt::WaitCursor);
 
@@ -144,8 +144,39 @@ void MainWindow::on_pushButtonLoadAndDisplay_clicked()
 	this->setCursor(Qt::ArrowCursor);
 }
 
-void MainWindow::on_pushButtonShowFullscreen_clicked()
+void MainWindow::on_pushButtonLoadFullscreen_clicked()
 {
+	QDialog* dialog = new QDialog(this);
+	QHBoxLayout* layout = new QHBoxLayout(dialog);
+	RenderWidget* renderWidget = new RenderWidget(dialog);
+
+	ui.renderWidget->hide();
+
+	layout->setContentsMargins(0, 0, 0, 0);
+	layout->addWidget(renderWidget);
+	dialog->setLayout(layout);
+	dialog->showFullScreen();
+
+	connect(dialog, SIGNAL(rejected()), this, SLOT(fullscreenDialogClosed()));
+	connect(dialog, SIGNAL(accepted()), this, SLOT(fullscreenDialogClosed()));
+}
+
+void MainWindow::on_pushButtonPickBackgroundColor_clicked()
+{
+	QColorDialog colorDialog;
+	QColor color = colorDialog.getColor(Qt::white, this, "Pick background color");
+
+	if (color.isValid())
+		ui.frameBackgroundColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3, %4);").arg(QString::number(color.red()), QString::number(color.green()), QString::number(color.blue()), QString::number(color.alpha())));
+}
+
+void MainWindow::on_pushButtonPickLineColor_clicked()
+{
+	QColorDialog colorDialog;
+	QColor color = colorDialog.getColor(Qt::white, this, "Pick line color");
+
+	if (color.isValid())
+		ui.frameLineColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3, %4);").arg(QString::number(color.red()), QString::number(color.green()), QString::number(color.blue()), QString::number(color.alpha())));
 }
 
 void MainWindow::updateChannelSelectors()
@@ -172,4 +203,9 @@ void MainWindow::updateChannelSelectors()
 		ui.spinBoxBlueChannel->setEnabled(ui.checkBoxBlueChannelEnabled->isChecked());
 		ui.spinBoxGrayscaleChannel->setEnabled(false);
 	}
+}
+
+void MainWindow::fullscreenDialogClosed()
+{
+	ui.renderWidget->show();
 }

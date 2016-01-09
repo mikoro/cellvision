@@ -32,10 +32,13 @@ namespace CellVision
 		void on_pushButtonBrowseTiffImage_clicked();
 		void on_pushButtonBrowseMetadataFile_clicked();
 		void on_pushButtonLoadFromMetadata_clicked();
-		void on_pushButtonLoadAndDisplay_clicked();
-		void on_pushButtonShowFullscreen_clicked();
+		void on_pushButtonLoadWindowed_clicked();
+		void on_pushButtonLoadFullscreen_clicked();
+		void on_pushButtonPickBackgroundColor_clicked();
+		void on_pushButtonPickLineColor_clicked();
 
 		void updateChannelSelectors();
+		void fullscreenDialogClosed();
 
 	private:
 
