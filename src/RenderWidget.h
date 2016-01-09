@@ -21,6 +21,15 @@ namespace Ui
 
 namespace CellVision
 {
+	struct OpenGLData
+	{
+		QOpenGLBuffer vbo;
+		QOpenGLVertexArrayObject vao;
+		QOpenGLShaderProgram program;
+		QMatrix4x4 modelMatrix;
+		QMatrix4x4 mvp;
+	};
+
 	class RenderWidget : public QOpenGLWidget, protected QOpenGLFunctions
 	{
 		Q_OBJECT
@@ -48,33 +57,19 @@ namespace CellVision
 		void updateLogic();
 		void resetCamera();
 
-		QOpenGLTexture volumeTexture;
-
-		QOpenGLBuffer cubeVbo;
-		QOpenGLVertexArrayObject cubeVao;
-		QOpenGLShaderProgram cubeProgram;
-		QMatrix4x4 cubeModelMatrix;
-		QMatrix4x4 cubeMvp;
-
-		QOpenGLBuffer cubeLinesVbo;
-		QOpenGLVertexArrayObject cubeLinesVao;
-		QOpenGLShaderProgram cubeLinesProgram;
-
-		QOpenGLBuffer planeVbo;
-		QOpenGLVertexArrayObject planeVao;
-		QOpenGLShaderProgram planeProgram;
-		QMatrix4x4 planeModelMatrix;
-		QMatrix4x4 planeMvp;
-
-		QOpenGLBuffer planeLinesVbo;
-		QOpenGLVertexArrayObject planeLinesVao;
-		QOpenGLShaderProgram planeLinesProgram;
-
 		KeyboardHelper keyboardHelper;
 		QPoint previousMousePosition;
 		QElapsedTimer timeStepTimer;
 		QVector3D cameraPosition;
-		QMatrix4x4 viewMatrix;
+		QMatrix4x4 cameraMatrix;
 		float moveSpeedModifier = 1.0f;
+
+		QOpenGLTexture volumeTexture;
+
+		OpenGLData cube;
+		OpenGLData cubeLines;
+		OpenGLData plane;
+		OpenGLData planeLines;
+		OpenGLData coordinateLines;
 	};
 }
