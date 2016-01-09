@@ -49,6 +49,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 	updateChannelSelectors();
 	updateFrameColors();
 
+	connect(ui.spinBoxChannelCount, SIGNAL(valueChanged(int)), this, SLOT(updateChannelSelectors()));
 	connect(ui.checkBoxRedChannelEnabled, SIGNAL(stateChanged(int)), this, SLOT(updateChannelSelectors()));
 	connect(ui.checkBoxGreenChannelEnabled, SIGNAL(stateChanged(int)), this, SLOT(updateChannelSelectors()));
 	connect(ui.checkBoxBlueChannelEnabled, SIGNAL(stateChanged(int)), this, SLOT(updateChannelSelectors()));
@@ -232,6 +233,10 @@ void MainWindow::updateChannelSelectors()
 	ui.spinBoxRedChannel->setEnabled(ui.checkBoxRedChannelEnabled->isChecked());
 	ui.spinBoxGreenChannel->setEnabled(ui.checkBoxGreenChannelEnabled->isChecked());
 	ui.spinBoxBlueChannel->setEnabled(ui.checkBoxBlueChannelEnabled->isChecked());
+
+	ui.spinBoxRedChannel->setMaximum(ui.spinBoxChannelCount->value());
+	ui.spinBoxGreenChannel->setMaximum(ui.spinBoxChannelCount->value());
+	ui.spinBoxBlueChannel->setMaximum(ui.spinBoxChannelCount->value());
 }
 
 void MainWindow::updateFrameColors()
