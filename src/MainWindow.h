@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include <map>
-
 #include "ui_MainWindow.h"
 
 namespace CellVision
@@ -20,12 +18,10 @@ namespace CellVision
 		explicit MainWindow(QWidget* parent = nullptr);
 
 		static Log& getLog();
-		static bool keyIsDown(int key);
-		static bool keyIsDownOnce(int key);
 
 	protected:
 
-		bool event(QEvent* event) override;
+		void keyPressEvent(QKeyEvent* ke) override;
 		void closeEvent(QCloseEvent* ce) override;
 
 	private slots:
@@ -47,9 +43,6 @@ namespace CellVision
 		Ui::MainWindowClass ui;
 
 		QDoubleValidator pixelValueValidator;
-
-		static std::map<int, bool> keyMap;
-		static std::map<int, bool> keyMapOnce;
 
 		QColor backgroundColor;
 		QColor lineColor;

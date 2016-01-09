@@ -10,9 +10,6 @@
 
 using namespace CellVision;
 
-std::map<int, bool> MainWindow::keyMap;
-std::map<int, bool> MainWindow::keyMapOnce;
-
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
@@ -61,53 +58,12 @@ Log& MainWindow::getLog()
 	return log;
 }
 
-bool MainWindow::keyIsDown(int key)
+void MainWindow::keyPressEvent(QKeyEvent* ke)
 {
-	if (keyMap.count(key) == 0)
-		return false;
+	if (ke->key() == Qt::Key_Escape)
+		close();
 
-	return keyMap[key];
-}
-
-bool MainWindow::keyIsDownOnce(int key)
-{
-	if (keyMap.count(key) == 0 || keyMapOnce[key])
-		return false;
-
-	if (keyMap[key])
-	{
-		keyMapOnce[key] = true;
-		return true;
-	}
-
-	return false;
-}
-
-bool MainWindow::event(QEvent* event)
-{
-	if (event->type() == QEvent::KeyPress)
-	{
-		QKeyEvent* ke = static_cast<QKeyEvent*>(event);
-
-		if (!ke->isAutoRepeat())
-			keyMap[ke->key()] = true;
-
-		if (ke->key() == Qt::Key_Escape)
-			close();
-	}
-
-	if (event->type() == QEvent::KeyRelease)
-	{
-		QKeyEvent* ke = static_cast<QKeyEvent*>(event);
-
-		if (!ke->isAutoRepeat())
-		{
-			keyMap[ke->key()] = false;
-			keyMapOnce[ke->key()] = false;
-		}
-	}
-
-	return QMainWindow::event(event);
+	ke->accept();
 }
 
 void MainWindow::closeEvent(QCloseEvent* ce)

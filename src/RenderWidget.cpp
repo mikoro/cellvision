@@ -30,9 +30,15 @@ void RenderWidget::uploadImageData(const ImageLoaderResult& result)
 	volumeTexture.release();
 }
 
+bool RenderWidget::event(QEvent* e)
+{
+	keyboardHelper.event(e);
+	return QOpenGLWidget::event(e);
+}
+
 void RenderWidget::mousePressEvent(QMouseEvent* me)
 {
-	//setFocus();
+	setFocus();
 
 	previousMousePosition = me->globalPos();
 
@@ -314,43 +320,43 @@ void RenderWidget::updateLogic()
 	float timeStep = timeStepTimer.nsecsElapsed() / 1000000000.0f;
 	timeStepTimer.restart();
 
-	if (MainWindow::keyIsDown(Qt::Key_PageUp))
+	if (keyboardHelper.keyIsDown(Qt::Key_PageUp))
 		moveSpeedModifier *= 1.05f;
 
-	if (MainWindow::keyIsDown(Qt::Key_PageDown))
+	if (keyboardHelper.keyIsDown(Qt::Key_PageDown))
 		moveSpeedModifier *= 0.95f;
 
 	float moveSpeed = 0.5f * moveSpeedModifier;
 
-	if (MainWindow::keyIsDown(Qt::Key_Shift))
+	if (keyboardHelper.keyIsDown(Qt::Key_Shift))
 		moveSpeed *= 2.0f;
 
-	if (MainWindow::keyIsDown(Qt::Key_Control))
+	if (keyboardHelper.keyIsDown(Qt::Key_Control))
 		moveSpeed *= 0.5f;
 
-	if (MainWindow::keyIsDown(Qt::Key_R))
+	if (keyboardHelper.keyIsDown(Qt::Key_R))
 		resetCamera();
 
 	QVector3D cameraRight = viewMatrix.column(0).toVector3D();
 	QVector3D cameraUp = viewMatrix.column(1).toVector3D();
 	QVector3D cameraForward = -viewMatrix.column(2).toVector3D();
 
-	if (MainWindow::keyIsDown(Qt::Key_W) || MainWindow::keyIsDown(Qt::Key_Up))
+	if (keyboardHelper.keyIsDown(Qt::Key_W) || keyboardHelper.keyIsDown(Qt::Key_Up))
 		cameraPosition += cameraForward * moveSpeed * timeStep;
 
-	if (MainWindow::keyIsDown(Qt::Key_S) || MainWindow::keyIsDown(Qt::Key_Down))
+	if (keyboardHelper.keyIsDown(Qt::Key_S) || keyboardHelper.keyIsDown(Qt::Key_Down))
 		cameraPosition -= cameraForward * moveSpeed * timeStep;
 
-	if (MainWindow::keyIsDown(Qt::Key_D) || MainWindow::keyIsDown(Qt::Key_Right))
+	if (keyboardHelper.keyIsDown(Qt::Key_D) || keyboardHelper.keyIsDown(Qt::Key_Right))
 		cameraPosition += cameraRight * moveSpeed * timeStep;
 
-	if (MainWindow::keyIsDown(Qt::Key_A) || MainWindow::keyIsDown(Qt::Key_Left))
+	if (keyboardHelper.keyIsDown(Qt::Key_A) || keyboardHelper.keyIsDown(Qt::Key_Left))
 		cameraPosition -= cameraRight * moveSpeed * timeStep;
 
-	if (MainWindow::keyIsDown(Qt::Key_E))
+	if (keyboardHelper.keyIsDown(Qt::Key_E))
 		cameraPosition += cameraUp * moveSpeed * timeStep;
 
-	if (MainWindow::keyIsDown(Qt::Key_Q))
+	if (keyboardHelper.keyIsDown(Qt::Key_Q))
 		cameraPosition -= cameraUp * moveSpeed * timeStep;
 
 	viewMatrix.setColumn(3, QVector4D(-cameraPosition.x(), -cameraPosition.y(), -cameraPosition.z(), 1.0f));

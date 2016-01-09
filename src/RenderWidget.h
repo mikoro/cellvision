@@ -12,6 +12,7 @@
 #include <QElapsedTimer>
 
 #include "ImageLoader.h"
+#include "KeyboardHelper.h"
 
 namespace Ui
 {
@@ -32,6 +33,8 @@ namespace CellVision
 
 	protected:
 
+		bool event(QEvent* e) override;
+
 		void mousePressEvent(QMouseEvent* me) override;
 		void mouseMoveEvent(QMouseEvent* me) override;
 		void wheelEvent(QWheelEvent* we) override;
@@ -44,10 +47,6 @@ namespace CellVision
 
 		void updateLogic();
 		void resetCamera();
-
-		QPoint previousMousePosition;
-
-		QElapsedTimer timeStepTimer;
 
 		QOpenGLTexture volumeTexture;
 
@@ -71,9 +70,11 @@ namespace CellVision
 		QOpenGLVertexArrayObject planeLinesVao;
 		QOpenGLShaderProgram planeLinesProgram;
 
+		KeyboardHelper keyboardHelper;
+		QPoint previousMousePosition;
+		QElapsedTimer timeStepTimer;
 		QVector3D cameraPosition;
 		QMatrix4x4 viewMatrix;
-
 		float moveSpeedModifier = 1.0f;
 	};
 }
