@@ -94,7 +94,7 @@
            <item row="2" column="4">
             <widget class="QLabel" name="label_4">
              <property name="text">
-              <string>Pixel height (y):</string>
+              <string>Image height (m):</string>
              </property>
             </widget>
            </item>
@@ -111,7 +111,7 @@
            <item row="0" column="4">
             <widget class="QLabel" name="label_3">
              <property name="text">
-              <string>Pixel width (x):</string>
+              <string>Image width (m):</string>
              </property>
             </widget>
            </item>
@@ -129,7 +129,7 @@
             </widget>
            </item>
            <item row="0" column="6">
-            <widget class="QLineEdit" name="lineEditPixelWidth">
+            <widget class="QLineEdit" name="lineEditImageWidth">
              <property name="maximumSize">
               <size>
                <width>200</width>
@@ -142,7 +142,7 @@
             </widget>
            </item>
            <item row="2" column="6">
-            <widget class="QLineEdit" name="lineEditPixelHeight">
+            <widget class="QLineEdit" name="lineEditImageHeight">
              <property name="maximumSize">
               <size>
                <width>200</width>
@@ -173,12 +173,12 @@
            <item row="4" column="4">
             <widget class="QLabel" name="label_5">
              <property name="text">
-              <string>Pixel depth (z):</string>
+              <string>Image depth (m):</string>
              </property>
             </widget>
            </item>
            <item row="4" column="6">
-            <widget class="QLineEdit" name="lineEditPixelDepth">
+            <widget class="QLineEdit" name="lineEditImageDepth">
              <property name="maximumSize">
               <size>
                <width>200</width>

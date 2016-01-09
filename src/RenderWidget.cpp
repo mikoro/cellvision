@@ -6,6 +6,7 @@
 #include "RenderWidget.h"
 #include "MainWindow.h"
 #include "Log.h"
+#include "ImageLoader.h"
 
 using namespace CellVision;
 
@@ -16,30 +17,43 @@ RenderWidget::RenderWidget(QWidget* parent) : QOpenGLWidget(parent), volumeTextu
 	setFocus();
 }
 
-void RenderWidget::uploadImageData(const ImageLoaderResult& result)
+void RenderWidget::initialize(const RenderWidgetSettings& settings_)
 {
-	volumeTexture.destroy();
-	volumeTexture.create();
-	volumeTexture.bind();
-	volumeTexture.setFormat(QOpenGLTexture::RGBA8_UNorm);
-	volumeTexture.setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
-	volumeTexture.setWrapMode(QOpenGLTexture::ClampToBorder);
-	volumeTexture.setBorderColor(0.0f, 0.0f, 0.0f, 1.0f);
-	volumeTexture.setMipLevels(1);
-	volumeTexture.setSize(result.width, result.height, result.depth);
-	volumeTexture.allocateStorage(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8);
-	volumeTexture.setData(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, &result.data[0]);
-	volumeTexture.release();
-}
+	settings = settings_;
 
-void RenderWidget::setBackgroundColor(const QColor& color)
-{
-	backgroundColor = color;
-}
+	if (!settings.imageFileName.empty())
+	{
+		ImageLoaderResult result = ImageLoader::loadFromMultipageTiff(settings.imageFileName, 0, 0, 0);
 
-void RenderWidget::setLineColor(const QColor& color)
-{
-	lineColor = color;
+		if (result.data.size() > 0)
+		{
+			volumeTexture.destroy();
+			volumeTexture.create();
+			volumeTexture.bind();
+			volumeTexture.setFormat(QOpenGLTexture::RGBA8_UNorm);
+			volumeTexture.setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
+			volumeTexture.setWrapMode(QOpenGLTexture::ClampToBorder);
+			volumeTexture.setBorderColor(0.0f, 0.0f, 0.0f, 1.0f);
+			volumeTexture.setMipLevels(1);
+			volumeTexture.setSize(result.width, result.height, result.depth);
+			volumeTexture.allocateStorage(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8);
+			volumeTexture.setData(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, &result.data[0]);
+			volumeTexture.release();
+		}
+	}
+
+	std::array<QVector3D, 72> cubeVertexData;
+	std::array<QVector3D, 24> cubeLinesVertexData;
+
+	generateCubeVertices(cubeVertexData, cubeLinesVertexData, settings.imageWidth, settings.imageHeight, settings.imageDepth);
+
+	cube.vbo.bind();
+	cube.vbo.write(0, cubeVertexData.data(), sizeof(cubeVertexData));
+	cube.vbo.release();
+
+	cubeLines.vbo.bind();
+	cubeLines.vbo.write(0, cubeLinesVertexData.data(), sizeof(cubeLinesVertexData));
+	cubeLines.vbo.release();
 }
 
 bool RenderWidget::event(QEvent* e)
@@ -62,7 +76,7 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 	QPoint mouseDelta = me->globalPos() - previousMousePosition;
 	previousMousePosition = me->globalPos();
 
-	cameraRotation += QVector2D(-mouseDelta.x(), -mouseDelta.y()) * mouseSpeedModifier;
+	cameraRotation += QVector2D(-mouseDelta.x(), -mouseDelta.y()) * settings.mouseSpeed;
 
 	QMatrix4x4 rotateYaw;
 	QMatrix4x4 rotatePitch;
@@ -94,32 +108,12 @@ void RenderWidget::initializeGL()
 
 	MainWindow::getLog().logInfo("OpenGL Vendor: %s | Renderer: %s | Version: %s | GLSL: %s", glGetString(GL_VENDOR), glGetString(GL_RENDERER), glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));;
 
+	std::array<QVector3D, 72> cubeVertexData;
+	std::array<QVector3D, 24> cubeLinesVertexData;
+
+	generateCubeVertices(cubeVertexData, cubeLinesVertexData, 1.0f, 1.0f, 1.0f);
+
 	// CUBE //
-
-	QVector3D v1(0, 0, 1); QVector3D t1(0, 0, 1);
-	QVector3D v2(1, 0, 1); QVector3D t2(1, 0, 1);
-	QVector3D v3(0, 1, 1); QVector3D t3(0, 1, 1);
-	QVector3D v4(1, 1, 1); QVector3D t4(1, 1, 1);
-	QVector3D v5(0, 0, 0); QVector3D t5(0, 0, 0);
-	QVector3D v6(1, 0, 0); QVector3D t6(1, 0, 0);
-	QVector3D v7(0, 1, 0); QVector3D t7(0, 1, 0);
-	QVector3D v8(1, 1, 0); QVector3D t8(1, 1, 0);
-
-	const QVector3D cubeVertexData[] =
-	{
-		v1, t1, v2, t2, v4, t4,
-		v1, t1, v4, t4, v3, t3,
-		v2, t2, v6, t6, v8, t8,
-		v2, t2, v8, t8, v4, t4,
-		v6, t6, v5, t5, v7, t7,
-		v6, t6, v7, t7, v8, t8,
-		v5, t5, v1, t1, v3, t3,
-		v5, t5, v3, t3, v7, t7,
-		v1, t1, v6, t6, v5, t5,
-		v1, t1, v2, t2, v6, t6,
-		v3, t3, v8, t8, v7, t7,
-		v3, t3, v4, t4, v8, t8
-	};
 
 	cube.program.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/cube.vert");
 	cube.program.addShaderFromSourceFile(QOpenGLShader::Fragment, "data/shaders/cube.frag");
@@ -129,7 +123,7 @@ void RenderWidget::initializeGL()
 	cube.vbo.create();
 	cube.vbo.bind();
 	cube.vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-	cube.vbo.allocate(cubeVertexData, sizeof(cubeVertexData));
+	cube.vbo.allocate(cubeVertexData.data(), sizeof(cubeVertexData));
 
 	cube.vao.create();
 	cube.vao.bind();
@@ -145,22 +139,6 @@ void RenderWidget::initializeGL()
 
 	// CUBE LINES //
 
-	const QVector3D cubeLinesVertexData[] =
-	{
-		v1, v2,
-		v2, v4,
-		v4, v3,
-		v3, v1,
-		v2, v6,
-		v6, v5,
-		v5, v1,
-		v6, v8,
-		v8, v7,
-		v7, v5,
-		v4, v8,
-		v3, v7,
-	};
-
 	cubeLines.program.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/lines.vert");
 	cubeLines.program.addShaderFromSourceFile(QOpenGLShader::Fragment, "data/shaders/lines.frag");
 	cubeLines.program.link();
@@ -169,7 +147,7 @@ void RenderWidget::initializeGL()
 	cubeLines.vbo.create();
 	cubeLines.vbo.bind();
 	cubeLines.vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-	cubeLines.vbo.allocate(cubeLinesVertexData, sizeof(cubeLinesVertexData));
+	cubeLines.vbo.allocate(cubeLinesVertexData.data(), sizeof(cubeLinesVertexData));
 
 	cubeLines.vao.create();
 	cubeLines.vao.bind();
@@ -183,10 +161,10 @@ void RenderWidget::initializeGL()
 
 	// PLANE //
 
-	v1 = QVector3D(-1, -1, 0);
-	v2 = QVector3D(1, -1, 0);
-	v3 = QVector3D(-1, 1, 0);
-	v4 = QVector3D(1, 1, 0);
+	QVector3D v1(-1, -1, 0);
+	QVector3D v2(1, -1, 0);
+	QVector3D v3(-1, 1, 0);
+	QVector3D v4(1, 1, 0);
 
 	const QVector3D planeVertexData[] =
 	{
@@ -246,9 +224,12 @@ void RenderWidget::initializeGL()
 
 	// COORDINATE LINES //
 
-	v1 = QVector3D(-1000, 0, 0); v2 = QVector3D(1000, 0, 0);
-	v3 = QVector3D(0, -1000, 0); v4 = QVector3D(0, 1000, 0);
-	v5 = QVector3D(0, 0, -1000); v6 = QVector3D(0, 0, 1000);
+	v1 = QVector3D(-1000, 0, 0);
+	v2 = QVector3D(1000, 0, 0);
+	v3 = QVector3D(0, -1000, 0);
+	v4 = QVector3D(0, 1000, 0);
+	QVector3D v5(0, 0, -1000);
+	QVector3D v6(0, 0, 1000);
 	
 	QVector3D c1(1, 0, 0);
 	QVector3D c2(0, 1, 0);
@@ -297,7 +278,7 @@ void RenderWidget::paintGL()
 {
 	updateLogic();
 
-	glClearColor(backgroundColor.redF(), backgroundColor.greenF(), backgroundColor.blueF(), backgroundColor.alphaF());
+	glClearColor(settings.backgroundColor.redF(), settings.backgroundColor.greenF(), settings.backgroundColor.blueF(), settings.backgroundColor.alphaF());
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -308,7 +289,7 @@ void RenderWidget::paintGL()
 
 	// COORDINATE LINES //
 
-	if (renderCoordinates)
+	if (settings.renderCoordinates)
 	{
 		coordinateLines.program.bind();
 		coordinateLines.vao.bind();
@@ -347,7 +328,7 @@ void RenderWidget::paintGL()
 	cubeLines.program.bind();
 	cubeLines.vao.bind();
 
-	cubeLines.program.setUniformValue("lineColor", lineColor);
+	cubeLines.program.setUniformValue("lineColor", settings.lineColor);
 	cubeLines.program.setUniformValue("mvp", cube.mvp);
 
 	glDrawArrays(GL_LINES, 0, 24);
@@ -391,24 +372,85 @@ void RenderWidget::paintGL()
 	planeLines.program.release();
 }
 
+void RenderWidget::generateCubeVertices(std::array<QVector3D, 72>& cubeVertexData, std::array<QVector3D, 24>& cubeLinesVertexData, float width, float height, float depth)
+{
+	float actualWidth = 1.0f;
+	float actualHeight = height / width;
+	float actualDepth = depth / width;
+
+	QVector3D v1(0, 0, actualDepth); 
+	QVector3D v2(actualWidth, 0, actualDepth); 
+	QVector3D v3(0, actualHeight, actualDepth); 
+	QVector3D v4(actualWidth, actualHeight, actualDepth); 
+	QVector3D v5(0, 0, 0); 
+	QVector3D v6(actualWidth, 0, 0); 
+	QVector3D v7(0, actualHeight, 0); 
+	QVector3D v8(actualWidth, actualHeight, 0); 
+
+	QVector3D t1(0, 0, 1);
+	QVector3D t2(1, 0, 1);
+	QVector3D t3(0, 1, 1);
+	QVector3D t4(1, 1, 1);
+	QVector3D t5(0, 0, 0);
+	QVector3D t6(1, 0, 0);
+	QVector3D t7(0, 1, 0);
+	QVector3D t8(1, 1, 0);
+
+	std::array<QVector3D, 72> cubeVertexDataTemp =
+	{
+		v1, t1, v2, t2, v4, t4,
+		v1, t1, v4, t4, v3, t3,
+		v2, t2, v6, t6, v8, t8,
+		v2, t2, v8, t8, v4, t4,
+		v6, t6, v5, t5, v7, t7,
+		v6, t6, v7, t7, v8, t8,
+		v5, t5, v1, t1, v3, t3,
+		v5, t5, v3, t3, v7, t7,
+		v1, t1, v6, t6, v5, t5,
+		v1, t1, v2, t2, v6, t6,
+		v3, t3, v8, t8, v7, t7,
+		v3, t3, v4, t4, v8, t8
+	};
+
+	cubeVertexData = cubeVertexDataTemp;
+
+	std::array<QVector3D, 24> cubeLinesVertexDataTemp =
+	{
+		v1, v2,
+		v2, v4,
+		v4, v3,
+		v3, v1,
+		v2, v6,
+		v6, v5,
+		v5, v1,
+		v6, v8,
+		v8, v7,
+		v7, v5,
+		v4, v8,
+		v3, v7,
+	};
+
+	cubeLinesVertexData = cubeLinesVertexDataTemp;
+}
+
 void RenderWidget::updateLogic()
 {
 	float timeStep = timeStepTimer.nsecsElapsed() / 1000000000.0f;
 	timeStepTimer.restart();
 
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_PageUp))
-		moveSpeedModifier *= 2.0f;
+		settings.moveSpeed *= 2.0f;
 
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_PageDown))
-		moveSpeedModifier *= 0.5f;
+		settings.moveSpeed *= 0.5f;
 
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_Home))
-		mouseSpeedModifier *= 2.0f;
+		settings.moveSpeed *= 2.0f;
 
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_End))
-		mouseSpeedModifier *= 0.5f;
+		settings.moveSpeed *= 0.5f;
 
-	float moveSpeed = 0.5f * moveSpeedModifier;
+	float moveSpeed = settings.moveSpeed;
 
 	if (keyboardHelper.keyIsDown(Qt::Key_Shift))
 		moveSpeed *= 2.0f;
@@ -420,7 +462,7 @@ void RenderWidget::updateLogic()
 		resetCamera();
 
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_C))
-		renderCoordinates = !renderCoordinates;
+		settings.renderCoordinates = !settings.renderCoordinates;
 
 	QVector3D cameraRight = cameraMatrix.column(0).toVector3D();
 	QVector3D cameraUp = cameraMatrix.column(1).toVector3D();

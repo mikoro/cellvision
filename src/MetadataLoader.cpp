@@ -37,20 +37,20 @@ MetadataLoaderResult MetadataLoader::loadFromFile(const std::string& fileName)
 			ss >> result.channelCount;
 		else if (part == "SizeZ")
 			ss >> result.imagesPerChannel;
-		else if (part == "HardwareSetting|ScannerSettingRecord|dblVoxelX")
+		else if (part == "HardwareSetting|ScannerSettingRecord|dblSizeX")
 		{
 			ss >> part;
-			ss >> result.pixelWidth;
+			ss >> result.imageWidth;
 		}
-		else if (part == "HardwareSetting|ScannerSettingRecord|dblVoxelY")
+		else if (part == "HardwareSetting|ScannerSettingRecord|dblSizeY")
 		{
 			ss >> part;
-			ss >> result.pixelHeight;
+			ss >> result.imageHeight;
 		}
-		else if (part == "HardwareSetting|ScannerSettingRecord|dblVoxelZ")
+		else if (part == "HardwareSetting|ScannerSettingRecord|dblSizeZ")
 		{
 			ss >> part;
-			ss >> result.pixelDepth;
+			ss >> result.imageDepth;
 		}
 	}
 

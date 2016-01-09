@@ -11,9 +11,9 @@ namespace CellVision
 	{
 		uint64_t channelCount = 0;
 		uint64_t imagesPerChannel = 0;
-		float pixelWidth = 0.0f;
-		float pixelHeight = 0.0f;
-		float pixelDepth = 0.0f;
+		float imageWidth = 0.0f;
+		float imageHeight = 0.0f;
+		float imageDepth = 0.0f;
 	};
 
 	class MetadataLoader

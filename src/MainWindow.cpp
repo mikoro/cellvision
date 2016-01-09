@@ -5,7 +5,6 @@
 
 #include "MainWindow.h"
 #include "Log.h"
-#include "ImageLoader.h"
 #include "MetadataLoader.h"
 
 using namespace CellVision;
@@ -19,11 +18,11 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 
 	QLocale locale(QLocale::English);
 
-	pixelValueValidator.setLocale(locale);
+	doubleValueValidator.setLocale(locale);
 
-	ui.lineEditPixelWidth->setValidator(&pixelValueValidator);
-	ui.lineEditPixelHeight->setValidator(&pixelValueValidator);
-	ui.lineEditPixelDepth->setValidator(&pixelValueValidator);
+	ui.lineEditImageWidth->setValidator(&doubleValueValidator);
+	ui.lineEditImageHeight->setValidator(&doubleValueValidator);
+	ui.lineEditImageDepth->setValidator(&doubleValueValidator);
 
 	QSettings settings;
 
@@ -31,9 +30,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 	ui.lineEditMetadataFileName->setText(settings.value("metadataFileName", "").toString());
 	ui.spinBoxChannelCount->setValue(settings.value("channelCount", 1).toInt());
 	ui.spinBoxImagesPerChannel->setValue(settings.value("imagesPerChannel", 1).toInt());
-	ui.lineEditPixelWidth->setText(locale.toString(settings.value("pixelWidth", 1.0).toDouble()));
-	ui.lineEditPixelHeight->setText(locale.toString(settings.value("pixelHeight", 1.0).toDouble()));
-	ui.lineEditPixelDepth->setText(locale.toString(settings.value("pixelDepth", 1.0).toDouble()));
+	ui.lineEditImageWidth->setText(locale.toString(settings.value("imageWidth", 1.0).toDouble()));
+	ui.lineEditImageHeight->setText(locale.toString(settings.value("imageHeight", 1.0).toDouble()));
+	ui.lineEditImageDepth->setText(locale.toString(settings.value("imageDepth", 1.0).toDouble()));
 	ui.spinBoxRedChannel->setValue(settings.value("redChannel", 1).toInt());
 	ui.spinBoxGreenChannel->setValue(settings.value("greenChannel", 1).toInt());
 	ui.spinBoxBlueChannel->setValue(settings.value("blueChannel", 1).toInt());
@@ -42,9 +41,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 	ui.checkBoxBlueChannelEnabled->setChecked(settings.value("blueChannelEnabled", false).toBool());
 	backgroundColor = settings.value("backgroundColor", QColor(100, 100, 100, 255)).value<QColor>();
 	lineColor = settings.value("lineColor", QColor(255, 255, 255, 128)).value<QColor>();
-
-	ui.renderWidget->setBackgroundColor(backgroundColor);
-	ui.renderWidget->setLineColor(lineColor);
 
 	updateChannelSelectors();
 	updateFrameColors();
@@ -77,9 +73,9 @@ void MainWindow::closeEvent(QCloseEvent* ce)
 	settings.setValue("metadataFileName", ui.lineEditMetadataFileName->text());
 	settings.setValue("channelCount", ui.spinBoxChannelCount->value());
 	settings.setValue("imagesPerChannel", ui.spinBoxImagesPerChannel->value());
-	settings.setValue("pixelWidth", ui.lineEditPixelWidth->text());
-	settings.setValue("pixelHeight", ui.lineEditPixelHeight->text());
-	settings.setValue("pixelDepth", ui.lineEditPixelDepth->text());
+	settings.setValue("imageWidth", ui.lineEditImageWidth->text());
+	settings.setValue("imageHeight", ui.lineEditImageHeight->text());
+	settings.setValue("imageDepth", ui.lineEditImageDepth->text());
 	settings.setValue("redChannel", ui.spinBoxRedChannel->value());
 	settings.setValue("greenChannel", ui.spinBoxGreenChannel->value());
 	settings.setValue("blueChannel", ui.spinBoxBlueChannel->value());
@@ -126,9 +122,9 @@ void MainWindow::on_pushButtonLoadFromMetadata_clicked()
 
 	ui.spinBoxChannelCount->setValue(result.channelCount);
 	ui.spinBoxImagesPerChannel->setValue(result.imagesPerChannel);
-	ui.lineEditPixelWidth->setText(locale.toString(result.pixelWidth));
-	ui.lineEditPixelHeight->setText(locale.toString(result.pixelHeight));
-	ui.lineEditPixelDepth->setText(locale.toString(result.pixelDepth));
+	ui.lineEditImageWidth->setText(locale.toString(result.imageWidth));
+	ui.lineEditImageHeight->setText(locale.toString(result.imageHeight));
+	ui.lineEditImageDepth->setText(locale.toString(result.imageDepth));
 
 	this->setCursor(Qt::ArrowCursor);
 }
@@ -137,13 +133,17 @@ void MainWindow::on_pushButtonLoadWindowed_clicked()
 {
 	this->setCursor(Qt::WaitCursor);
 
-	std::string fileName = ui.lineEditTiffImageFileName->text().toStdString();
+	QLocale locale(QLocale::English);
 
-	ImageLoaderResult result = ImageLoader::loadFromMultipageTiff(fileName, 0, 0, 0);
-	//ui.renderWidget->uploadImageData(result);
+	RenderWidgetSettings settings;
+	settings.imageFileName = ui.lineEditTiffImageFileName->text().toStdString();
+	settings.backgroundColor = backgroundColor;
+	settings.lineColor = lineColor;
+	settings.imageWidth = locale.toFloat(ui.lineEditImageWidth->text());
+	settings.imageHeight = locale.toFloat(ui.lineEditImageHeight->text());
+	settings.imageDepth = locale.toFloat(ui.lineEditImageDepth->text());
 
-	ui.renderWidget->setBackgroundColor(backgroundColor);
-	ui.renderWidget->setLineColor(lineColor);
+	ui.renderWidget->initialize(settings);
 
 	this->setCursor(Qt::ArrowCursor);
 }
@@ -153,9 +153,6 @@ void MainWindow::on_pushButtonLoadFullscreen_clicked()
 	QDialog* dialog = new QDialog(this);
 	QHBoxLayout* layout = new QHBoxLayout(dialog);
 	RenderWidget* renderWidget = new RenderWidget(dialog);
-
-	renderWidget->setBackgroundColor(backgroundColor);
-	renderWidget->setLineColor(lineColor);
 
 	ui.renderWidget->hide();
 

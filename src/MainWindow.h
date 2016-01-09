@@ -42,7 +42,7 @@ namespace CellVision
 
 		Ui::MainWindowClass ui;
 
-		QDoubleValidator pixelValueValidator;
+		QDoubleValidator doubleValueValidator;
 
 		QColor backgroundColor;
 		QColor lineColor;

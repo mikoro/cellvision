@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <array>
+
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLBuffer>
@@ -30,6 +32,19 @@ namespace CellVision
 		QMatrix4x4 mvp;
 	};
 
+	struct RenderWidgetSettings
+	{
+		std::string imageFileName;
+		QColor backgroundColor = QColor(100, 100, 100, 255);
+		QColor lineColor = QColor(255, 255, 255, 128);
+		float imageWidth = 1.0f;
+		float imageHeight = 1.0f;
+		float imageDepth = 1.0f;
+		float moveSpeed = 1.0f;
+		float mouseSpeed = 0.25f;
+		bool renderCoordinates = true;
+	};
+
 	class RenderWidget : public QOpenGLWidget, protected QOpenGLFunctions
 	{
 		Q_OBJECT
@@ -38,10 +53,8 @@ namespace CellVision
 
 		explicit RenderWidget(QWidget* parent = nullptr);
 		
-		void uploadImageData(const ImageLoaderResult& result);
-		void setBackgroundColor(const QColor& color);
-		void setLineColor(const QColor& color);
-
+		void initialize(const RenderWidgetSettings& settings);
+		
 	protected:
 
 		bool event(QEvent* e) override;
@@ -56,8 +69,12 @@ namespace CellVision
 
 	private:
 
+		void generateCubeVertices(std::array<QVector3D, 72>& cubeVertexData, std::array<QVector3D, 24>& cubeLinesVertexData, float width, float height, float depth);
+
 		void updateLogic();
 		void resetCamera();
+
+		RenderWidgetSettings settings;
 
 		KeyboardHelper keyboardHelper;
 		QPoint previousMousePosition;
@@ -65,11 +82,6 @@ namespace CellVision
 		QVector3D cameraPosition;
 		QVector2D cameraRotation;
 		QMatrix4x4 cameraMatrix;
-		float moveSpeedModifier = 1.0f;
-		float mouseSpeedModifier = 0.25f;
-		bool renderCoordinates = true;
-		QColor backgroundColor;
-		QColor lineColor;
 
 		QOpenGLTexture volumeTexture;
 
