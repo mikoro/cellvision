@@ -32,6 +32,16 @@ void RenderWidget::uploadImageData(const ImageLoaderResult& result)
 	volumeTexture.release();
 }
 
+void RenderWidget::setBackgroundColor(const QColor& color)
+{
+	backgroundColor = color;
+}
+
+void RenderWidget::setLineColor(const QColor& color)
+{
+	lineColor = color;
+}
+
 bool RenderWidget::event(QEvent* e)
 {
 	keyboardHelper.event(e);
@@ -287,7 +297,7 @@ void RenderWidget::paintGL()
 {
 	updateLogic();
 
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(backgroundColor.redF(), backgroundColor.greenF(), backgroundColor.blueF(), backgroundColor.alphaF());
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -337,7 +347,7 @@ void RenderWidget::paintGL()
 	cubeLines.program.bind();
 	cubeLines.vao.bind();
 
-	cubeLines.program.setUniformValue("lineColor", QVector4D(1.0f, 1.0f, 1.0f, 0.5f));
+	cubeLines.program.setUniformValue("lineColor", lineColor);
 	cubeLines.program.setUniformValue("mvp", cube.mvp);
 
 	glDrawArrays(GL_LINES, 0, 24);
@@ -345,9 +355,9 @@ void RenderWidget::paintGL()
 	cubeLines.vao.release();
 	cubeLines.program.release();
 
-	// PLANE //
+	glEnable(GL_DEPTH_TEST);
 
-	glDisable(GL_DEPTH_TEST);
+	// PLANE //
 
 	plane.program.bind();
 	plane.vao.bind();

@@ -40,8 +40,11 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 	ui.checkBoxRedChannelEnabled->setChecked(settings.value("redChannelEnabled", false).toBool());
 	ui.checkBoxGreenChannelEnabled->setChecked(settings.value("greenChannelEnabled", false).toBool());
 	ui.checkBoxBlueChannelEnabled->setChecked(settings.value("blueChannelEnabled", false).toBool());
-	backgroundColor = settings.value("backgroundColor", QColor(0, 0, 0, 255)).value<QColor>();
-	lineColor = settings.value("lineColor", QColor(255, 255, 255, 255)).value<QColor>();
+	backgroundColor = settings.value("backgroundColor", QColor(100, 100, 100, 255)).value<QColor>();
+	lineColor = settings.value("lineColor", QColor(255, 255, 255, 128)).value<QColor>();
+
+	ui.renderWidget->setBackgroundColor(backgroundColor);
+	ui.renderWidget->setLineColor(lineColor);
 
 	updateChannelSelectors();
 	updateFrameColors();
@@ -139,6 +142,9 @@ void MainWindow::on_pushButtonLoadWindowed_clicked()
 	ImageLoaderResult result = ImageLoader::loadFromMultipageTiff(fileName, 0, 0, 0);
 	//ui.renderWidget->uploadImageData(result);
 
+	ui.renderWidget->setBackgroundColor(backgroundColor);
+	ui.renderWidget->setLineColor(lineColor);
+
 	this->setCursor(Qt::ArrowCursor);
 }
 
@@ -147,6 +153,9 @@ void MainWindow::on_pushButtonLoadFullscreen_clicked()
 	QDialog* dialog = new QDialog(this);
 	QHBoxLayout* layout = new QHBoxLayout(dialog);
 	RenderWidget* renderWidget = new RenderWidget(dialog);
+
+	renderWidget->setBackgroundColor(backgroundColor);
+	renderWidget->setLineColor(lineColor);
 
 	ui.renderWidget->hide();
 

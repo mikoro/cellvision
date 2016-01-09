@@ -39,6 +39,8 @@ namespace CellVision
 		explicit RenderWidget(QWidget* parent = nullptr);
 		
 		void uploadImageData(const ImageLoaderResult& result);
+		void setBackgroundColor(const QColor& color);
+		void setLineColor(const QColor& color);
 
 	protected:
 
@@ -66,6 +68,8 @@ namespace CellVision
 		float moveSpeedModifier = 1.0f;
 		float mouseSpeedModifier = 0.25f;
 		bool renderCoordinates = true;
+		QColor backgroundColor;
+		QColor lineColor;
 
 		QOpenGLTexture volumeTexture;
 
