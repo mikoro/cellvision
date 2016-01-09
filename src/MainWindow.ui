@@ -267,6 +267,64 @@
            <string>Data visualization</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_4">
+           <item row="0" column="5">
+            <spacer name="horizontalSpacer_6">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>10</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="7">
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="1" column="6">
+            <widget class="QSpinBox" name="spinBoxBlueChannel">
+             <property name="minimumSize">
+              <size>
+               <width>80</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>999999</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="8">
+            <widget class="QPushButton" name="pushButtonLoadFullscreen">
+             <property name="minimumSize">
+              <size>
+               <width>120</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Load fullscreen</string>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="3">
             <spacer name="horizontalSpacer_5">
              <property name="orientation">
@@ -283,34 +341,31 @@
              </property>
             </spacer>
            </item>
-           <item row="0" column="10">
-            <widget class="QPushButton" name="pushButtonLoadWindowed">
-             <property name="minimumSize">
-              <size>
-               <width>120</width>
-               <height>0</height>
-              </size>
-             </property>
+           <item row="0" column="4">
+            <widget class="QLabel" name="label_10">
              <property name="text">
-              <string>Load windowed</string>
+              <string>Green</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
              </property>
             </widget>
            </item>
-           <item row="0" column="5">
-            <spacer name="horizontalSpacer_6">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
+           <item row="1" column="2">
+            <widget class="QSpinBox" name="spinBoxRedChannel">
+             <property name="minimumSize">
               <size>
-               <width>10</width>
-               <height>20</height>
+               <width>80</width>
+               <height>0</height>
               </size>
              </property>
-            </spacer>
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>999999</number>
+             </property>
+            </widget>
            </item>
            <item row="0" column="1">
             <spacer name="horizontalSpacer_4">
@@ -328,6 +383,36 @@
              </property>
             </spacer>
            </item>
+           <item row="1" column="4">
+            <widget class="QSpinBox" name="spinBoxGreenChannel">
+             <property name="minimumSize">
+              <size>
+               <width>80</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>999999</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>Channel</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>Color</string>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="6">
             <widget class="QLabel" name="label_11">
              <property name="text">
@@ -335,65 +420,6 @@
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="4">
-            <widget class="QLabel" name="label_10">
-             <property name="text">
-              <string>Green</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="7">
-            <spacer name="horizontalSpacer_7">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>10</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="8">
-            <widget class="QLabel" name="label_12">
-             <property name="text">
-              <string>Grayscale</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="9">
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="3" column="8">
-            <widget class="QCheckBox" name="checkBoxGrayscaleChannelEnabled">
-             <property name="styleSheet">
-              <string notr="true">padding-left: 30px</string>
-             </property>
-             <property name="text">
-              <string/>
              </property>
             </widget>
            </item>
@@ -420,86 +446,8 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="2">
-            <widget class="QSpinBox" name="spinBoxRedChannel">
-             <property name="minimumSize">
-              <size>
-               <width>80</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="minimum">
-              <number>1</number>
-             </property>
-             <property name="maximum">
-              <number>999999</number>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="4">
-            <widget class="QSpinBox" name="spinBoxGreenChannel">
-             <property name="minimumSize">
-              <size>
-               <width>80</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="minimum">
-              <number>1</number>
-             </property>
-             <property name="maximum">
-              <number>999999</number>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_7">
-             <property name="text">
-              <string>Channel</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="6">
-            <widget class="QSpinBox" name="spinBoxBlueChannel">
-             <property name="minimumSize">
-              <size>
-               <width>80</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="minimum">
-              <number>1</number>
-             </property>
-             <property name="maximum">
-              <number>999999</number>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="8">
-            <widget class="QSpinBox" name="spinBoxGrayscaleChannel">
-             <property name="minimumSize">
-              <size>
-               <width>80</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="minimum">
-              <number>1</number>
-             </property>
-             <property name="maximum">
-              <number>999999</number>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_6">
-             <property name="text">
-              <string>Color</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="10">
-            <widget class="QPushButton" name="pushButtonLoadFullscreen">
+           <item row="0" column="8">
+            <widget class="QPushButton" name="pushButtonLoadWindowed">
              <property name="minimumSize">
               <size>
                <width>120</width>
@@ -507,27 +455,14 @@
               </size>
              </property>
              <property name="text">
-              <string>Load fullscreen</string>
+              <string>Load windowed</string>
              </property>
             </widget>
            </item>
-           <item row="3" column="2">
-            <widget class="QCheckBox" name="checkBoxRedChannelEnabled">
-             <property name="styleSheet">
-              <string notr="true">padding-left: 30px</string>
-             </property>
+           <item row="6" column="4">
+            <widget class="QPushButton" name="pushButtonPickLineColor">
              <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="6">
-            <widget class="QCheckBox" name="checkBoxBlueChannelEnabled">
-             <property name="styleSheet">
-              <string notr="true">padding-left: 30px</string>
-             </property>
-             <property name="text">
-              <string/>
+              <string>Pick</string>
              </property>
             </widget>
            </item>
@@ -541,20 +476,13 @@
              </property>
             </widget>
            </item>
-           <item row="5" column="2">
-            <widget class="QFrame" name="frameBackgroundColor">
-             <property name="frameShape">
-              <enum>QFrame::Box</enum>
+           <item row="3" column="2">
+            <widget class="QCheckBox" name="checkBoxRedChannelEnabled">
+             <property name="styleSheet">
+              <string notr="true">padding-left: 30px</string>
              </property>
-             <property name="frameShadow">
-              <enum>QFrame::Plain</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="label_13">
              <property name="text">
-              <string>Background color:</string>
+              <string/>
              </property>
             </widget>
            </item>
@@ -565,25 +493,25 @@
              </property>
             </widget>
            </item>
+           <item row="3" column="6">
+            <widget class="QCheckBox" name="checkBoxBlueChannelEnabled">
+             <property name="styleSheet">
+              <string notr="true">padding-left: 30px</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_13">
+             <property name="text">
+              <string>Background color:</string>
+             </property>
+            </widget>
+           </item>
            <item row="5" column="4">
             <widget class="QPushButton" name="pushButtonPickBackgroundColor">
-             <property name="text">
-              <string>Pick</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="2">
-            <widget class="QFrame" name="frameLineColor">
-             <property name="frameShape">
-              <enum>QFrame::Box</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Plain</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="4">
-            <widget class="QPushButton" name="pushButtonPickLineColor">
              <property name="text">
               <string>Pick</string>
              </property>
@@ -604,6 +532,26 @@
               </size>
              </property>
             </spacer>
+           </item>
+           <item row="5" column="2">
+            <widget class="QFrame" name="frameBackgroundColor">
+             <property name="frameShape">
+              <enum>QFrame::Box</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="2">
+            <widget class="QFrame" name="frameLineColor">
+             <property name="frameShape">
+              <enum>QFrame::Box</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>

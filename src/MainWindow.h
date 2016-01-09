@@ -26,6 +26,7 @@ namespace CellVision
 	protected:
 
 		bool event(QEvent* event) override;
+		void closeEvent(QCloseEvent* ce) override;
 
 	private slots:
 
@@ -38,6 +39,7 @@ namespace CellVision
 		void on_pushButtonPickLineColor_clicked();
 
 		void updateChannelSelectors();
+		void updateFrameColors();
 		void fullscreenDialogClosed();
 
 	private:
@@ -48,5 +50,8 @@ namespace CellVision
 
 		static std::map<int, bool> keyMap;
 		static std::map<int, bool> keyMapOnce;
+
+		QColor backgroundColor;
+		QColor lineColor;
 	};
 }

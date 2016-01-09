@@ -39,6 +39,16 @@ namespace
 
 int main(int argc, char *argv[])
 {
+	QCoreApplication::setOrganizationDomain("cellvision.com");
+
+#ifdef Q_OS_WIN32
+	QCoreApplication::setOrganizationName("CellVision");
+	QCoreApplication::setApplicationName("CellVision");
+#else
+	QCoreApplication::setOrganizationName("cellvision");
+	QCoreApplication::setApplicationName("cellvision");
+#endif
+
 	QSurfaceFormat format;
 	format.setSwapInterval(1);
 	format.setSamples(4);

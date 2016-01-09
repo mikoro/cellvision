@@ -20,20 +20,38 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 	resize(1280, 1000);
 	ui.splitterMain->setSizes({ 1000, 1 });
 
-	setFocus();
+	QLocale locale(QLocale::English);
 
-	updateChannelSelectors();
-
-	connect(ui.checkBoxRedChannelEnabled, SIGNAL(stateChanged(int)), this, SLOT(updateChannelSelectors()));
-	connect(ui.checkBoxGreenChannelEnabled, SIGNAL(stateChanged(int)), this, SLOT(updateChannelSelectors()));
-	connect(ui.checkBoxBlueChannelEnabled, SIGNAL(stateChanged(int)), this, SLOT(updateChannelSelectors()));
-	connect(ui.checkBoxGrayscaleChannelEnabled, SIGNAL(stateChanged(int)), this, SLOT(updateChannelSelectors()));
-
-	pixelValueValidator.setLocale(QLocale::English);
+	pixelValueValidator.setLocale(locale);
 
 	ui.lineEditPixelWidth->setValidator(&pixelValueValidator);
 	ui.lineEditPixelHeight->setValidator(&pixelValueValidator);
 	ui.lineEditPixelDepth->setValidator(&pixelValueValidator);
+
+	QSettings settings;
+
+	ui.lineEditTiffImageFileName->setText(settings.value("tiffImageFileName", "").toString());
+	ui.lineEditMetadataFileName->setText(settings.value("metadataFileName", "").toString());
+	ui.spinBoxChannelCount->setValue(settings.value("channelCount", 1).toInt());
+	ui.spinBoxImagesPerChannel->setValue(settings.value("imagesPerChannel", 1).toInt());
+	ui.lineEditPixelWidth->setText(locale.toString(settings.value("pixelWidth", 1.0).toDouble()));
+	ui.lineEditPixelHeight->setText(locale.toString(settings.value("pixelHeight", 1.0).toDouble()));
+	ui.lineEditPixelDepth->setText(locale.toString(settings.value("pixelDepth", 1.0).toDouble()));
+	ui.spinBoxRedChannel->setValue(settings.value("redChannel", 1).toInt());
+	ui.spinBoxGreenChannel->setValue(settings.value("greenChannel", 1).toInt());
+	ui.spinBoxBlueChannel->setValue(settings.value("blueChannel", 1).toInt());
+	ui.checkBoxRedChannelEnabled->setChecked(settings.value("redChannelEnabled", false).toBool());
+	ui.checkBoxGreenChannelEnabled->setChecked(settings.value("greenChannelEnabled", false).toBool());
+	ui.checkBoxBlueChannelEnabled->setChecked(settings.value("blueChannelEnabled", false).toBool());
+	backgroundColor = settings.value("backgroundColor", QColor(0, 0, 0, 255)).value<QColor>();
+	lineColor = settings.value("lineColor", QColor(255, 255, 255, 255)).value<QColor>();
+
+	updateChannelSelectors();
+	updateFrameColors();
+
+	connect(ui.checkBoxRedChannelEnabled, SIGNAL(stateChanged(int)), this, SLOT(updateChannelSelectors()));
+	connect(ui.checkBoxGreenChannelEnabled, SIGNAL(stateChanged(int)), this, SLOT(updateChannelSelectors()));
+	connect(ui.checkBoxBlueChannelEnabled, SIGNAL(stateChanged(int)), this, SLOT(updateChannelSelectors()));
 }
 
 Log& MainWindow::getLog()
@@ -89,6 +107,29 @@ bool MainWindow::event(QEvent* event)
 	}
 
 	return QMainWindow::event(event);
+}
+
+void MainWindow::closeEvent(QCloseEvent* ce)
+{
+	QSettings settings;
+
+	settings.setValue("tiffImageFileName", ui.lineEditTiffImageFileName->text());
+	settings.setValue("metadataFileName", ui.lineEditMetadataFileName->text());
+	settings.setValue("channelCount", ui.spinBoxChannelCount->value());
+	settings.setValue("imagesPerChannel", ui.spinBoxImagesPerChannel->value());
+	settings.setValue("pixelWidth", ui.lineEditPixelWidth->text());
+	settings.setValue("pixelHeight", ui.lineEditPixelHeight->text());
+	settings.setValue("pixelDepth", ui.lineEditPixelDepth->text());
+	settings.setValue("redChannel", ui.spinBoxRedChannel->value());
+	settings.setValue("greenChannel", ui.spinBoxGreenChannel->value());
+	settings.setValue("blueChannel", ui.spinBoxBlueChannel->value());
+	settings.setValue("redChannelEnabled", ui.checkBoxRedChannelEnabled->isChecked());
+	settings.setValue("greenChannelEnabled", ui.checkBoxGreenChannelEnabled->isChecked());
+	settings.setValue("blueChannelEnabled", ui.checkBoxBlueChannelEnabled->isChecked());
+	settings.setValue("backgroundColor", backgroundColor);
+	settings.setValue("lineColor", lineColor);
+
+	ce->accept();
 }
 
 void MainWindow::on_pushButtonBrowseTiffImage_clicked()
@@ -167,7 +208,11 @@ void MainWindow::on_pushButtonPickBackgroundColor_clicked()
 	QColor color = colorDialog.getColor(Qt::white, this, "Pick background color");
 
 	if (color.isValid())
-		ui.frameBackgroundColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3, %4);").arg(QString::number(color.red()), QString::number(color.green()), QString::number(color.blue()), QString::number(color.alpha())));
+	{
+		backgroundColor = color;
+		updateFrameColors();
+	}
+		
 }
 
 void MainWindow::on_pushButtonPickLineColor_clicked()
@@ -176,33 +221,23 @@ void MainWindow::on_pushButtonPickLineColor_clicked()
 	QColor color = colorDialog.getColor(Qt::white, this, "Pick line color");
 
 	if (color.isValid())
-		ui.frameLineColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3, %4);").arg(QString::number(color.red()), QString::number(color.green()), QString::number(color.blue()), QString::number(color.alpha())));
+	{
+		lineColor = color;
+		updateFrameColors();
+	}
 }
 
 void MainWindow::updateChannelSelectors()
 {
-	if (ui.checkBoxGrayscaleChannelEnabled->isChecked())
-	{
-		ui.checkBoxRedChannelEnabled->setEnabled(false);
-		ui.checkBoxGreenChannelEnabled->setEnabled(false);
-		ui.checkBoxBlueChannelEnabled->setEnabled(false);
+	ui.spinBoxRedChannel->setEnabled(ui.checkBoxRedChannelEnabled->isChecked());
+	ui.spinBoxGreenChannel->setEnabled(ui.checkBoxGreenChannelEnabled->isChecked());
+	ui.spinBoxBlueChannel->setEnabled(ui.checkBoxBlueChannelEnabled->isChecked());
+}
 
-		ui.spinBoxRedChannel->setEnabled(false);
-		ui.spinBoxGreenChannel->setEnabled(false);
-		ui.spinBoxBlueChannel->setEnabled(false);
-		ui.spinBoxGrayscaleChannel->setEnabled(true);
-	}
-	else
-	{
-		ui.checkBoxRedChannelEnabled->setEnabled(true);
-		ui.checkBoxGreenChannelEnabled->setEnabled(true);
-		ui.checkBoxBlueChannelEnabled->setEnabled(true);
-
-		ui.spinBoxRedChannel->setEnabled(ui.checkBoxRedChannelEnabled->isChecked());
-		ui.spinBoxGreenChannel->setEnabled(ui.checkBoxGreenChannelEnabled->isChecked());
-		ui.spinBoxBlueChannel->setEnabled(ui.checkBoxBlueChannelEnabled->isChecked());
-		ui.spinBoxGrayscaleChannel->setEnabled(false);
-	}
+void MainWindow::updateFrameColors()
+{
+	ui.frameBackgroundColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3, %4);").arg(QString::number(backgroundColor.red()), QString::number(backgroundColor.green()), QString::number(backgroundColor.blue()), QString::number(backgroundColor.alpha())));
+	ui.frameLineColor->setStyleSheet(QString("background-color: rgb(%1, %2, %3, %4);").arg(QString::number(lineColor.red()), QString::number(lineColor.green()), QString::number(lineColor.blue()), QString::number(lineColor.alpha())));
 }
 
 void MainWindow::fullscreenDialogClosed()
