@@ -137,18 +137,18 @@ void RenderWidget::initializeGL()
 
 	const QVector3D cubeLinesVertexData[] =
 	{
-		v1, t1, v2, t2,
-		v2, t2, v4, t4,
-		v4, t4, v3, t3,
-		v3, t3, v1, t1,
-		v2, t2, v6, t6,
-		v6, t6, v5, t5,
-		v5, t5, v1, t1,
-		v6, t6, v8, t8,
-		v8, t8, v7, t7,
-		v7, t7, v5, t5,
-		v4, t4, v8, t8,
-		v3, t3, v7, t7
+		v1, v2,
+		v2, v4,
+		v4, v3,
+		v3, v1,
+		v2, v6,
+		v6, v5,
+		v5, v1,
+		v6, v8,
+		v8, v7,
+		v7, v5,
+		v4, v8,
+		v3, v7,
 	};
 
 	cubeLines.program.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/lines.vert");
@@ -165,9 +165,7 @@ void RenderWidget::initializeGL()
 	cubeLines.vao.bind();
 
 	cubeLines.program.enableAttributeArray("position");
-	cubeLines.program.enableAttributeArray("texcoord");
-	cubeLines.program.setAttributeBuffer("position", GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
-	cubeLines.program.setAttributeBuffer("texcoord", GL_FLOAT, 3 * sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
+	cubeLines.program.setAttributeBuffer("position", GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
 
 	cubeLines.vao.release();
 	cubeLines.vbo.release();
@@ -175,15 +173,15 @@ void RenderWidget::initializeGL()
 
 	// PLANE //
 
-	v1 = QVector3D(-1, -1, 0); t1 = QVector3D(-1, -1, 0);
-	v2 = QVector3D(1, -1, 0); t2 = QVector3D(1, -1, 0);
-	v3 = QVector3D(-1, 1, 0); t3 = QVector3D(-1, 1, 0);
-	v4 = QVector3D(1, 1, 0); t4 = QVector3D(1, 1, 0);
+	v1 = QVector3D(-1, -1, 0);
+	v2 = QVector3D(1, -1, 0);
+	v3 = QVector3D(-1, 1, 0);
+	v4 = QVector3D(1, 1, 0);
 
 	const QVector3D planeVertexData[] =
 	{
-		v1, t1, v2, t2, v4, t4,
-		v1, t1, v4, t4, v3, t3
+		v1, v2, v4,
+		v1, v4, v3
 	};
 
 	plane.program.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/plane.vert");
@@ -200,9 +198,7 @@ void RenderWidget::initializeGL()
 	plane.vao.bind();
 
 	plane.program.enableAttributeArray("position");
-	plane.program.enableAttributeArray("texcoord");
-	plane.program.setAttributeBuffer("position", GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
-	plane.program.setAttributeBuffer("texcoord", GL_FLOAT, 3 * sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
+	plane.program.setAttributeBuffer("position", GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
 
 	plane.vao.release();
 	plane.vbo.release();
@@ -212,10 +208,10 @@ void RenderWidget::initializeGL()
 
 	const QVector3D planeLinesVertexData[] =
 	{
-		v1, t1, v2, t2,
-		v2, t2, v4, t4,
-		v4, t4, v3, t3,
-		v3, t3, v1, t1
+		v1, v2,
+		v2, v4,
+		v4, v3,
+		v3, v1
 	};
 
 	planeLines.program.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/lines.vert");
@@ -232,13 +228,50 @@ void RenderWidget::initializeGL()
 	planeLines.vao.bind();
 
 	planeLines.program.enableAttributeArray("position");
-	planeLines.program.enableAttributeArray("texcoord");
-	planeLines.program.setAttributeBuffer("position", GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
-	planeLines.program.setAttributeBuffer("texcoord", GL_FLOAT, 3 * sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
+	planeLines.program.setAttributeBuffer("position", GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
 
 	planeLines.vao.release();
 	planeLines.vbo.release();
 	planeLines.program.release();
+
+	// COORDINATE LINES //
+
+	v1 = QVector3D(-1000, 0, 0); v2 = QVector3D(1000, 0, 0);
+	v3 = QVector3D(0, -1000, 0); v4 = QVector3D(0, 1000, 0);
+	v5 = QVector3D(0, 0, -1000); v6 = QVector3D(0, 0, 1000);
+	
+	QVector3D c1(1, 0, 0);
+	QVector3D c2(0, 1, 0);
+	QVector3D c3(0, 0, 1);
+
+	const QVector3D coordinateLinesVertexData[] =
+	{
+		v1, c1, v2, c1,
+		v3, c2, v4, c2,
+		v5, c3, v6, c3
+	};
+
+	coordinateLines.program.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/coordinates.vert");
+	coordinateLines.program.addShaderFromSourceFile(QOpenGLShader::Fragment, "data/shaders/coordinates.frag");
+	coordinateLines.program.link();
+	coordinateLines.program.bind();
+
+	coordinateLines.vbo.create();
+	coordinateLines.vbo.bind();
+	coordinateLines.vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
+	coordinateLines.vbo.allocate(coordinateLinesVertexData, sizeof(coordinateLinesVertexData));
+
+	coordinateLines.vao.create();
+	coordinateLines.vao.bind();
+
+	coordinateLines.program.enableAttributeArray("position");
+	coordinateLines.program.enableAttributeArray("color");
+	coordinateLines.program.setAttributeBuffer("position", GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
+	coordinateLines.program.setAttributeBuffer("color", GL_FLOAT, 3 * sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
+
+	coordinateLines.vao.release();
+	coordinateLines.vbo.release();
+	coordinateLines.program.release();
 
 	// MISC //
 
@@ -263,6 +296,21 @@ void RenderWidget::paintGL()
 	glLineWidth(4.0f);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	// COORDINATE LINES //
+
+	if (renderCoordinates)
+	{
+		coordinateLines.program.bind();
+		coordinateLines.vao.bind();
+
+		coordinateLines.program.setUniformValue("mvp", coordinateLines.mvp);
+
+		glDrawArrays(GL_LINES, 0, 6);
+
+		coordinateLines.vao.release();
+		coordinateLines.program.release();
+	}
+
 	// CUBE //
 
 	cube.program.bind();
@@ -274,7 +322,7 @@ void RenderWidget::paintGL()
 	cube.program.setUniformValue("texture0", 0);
 	cube.program.setUniformValue("mvp", cube.mvp);
 
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+	//glDrawArrays(GL_TRIANGLES, 0, 36);
 
 	if (volumeTexture.isCreated())
 		volumeTexture.release();
@@ -308,7 +356,7 @@ void RenderWidget::paintGL()
 		volumeTexture.bind();
 
 	plane.program.setUniformValue("texture0", 0);
-	plane.program.setUniformValue("model", plane.modelMatrix);
+	plane.program.setUniformValue("modelMatrix", plane.modelMatrix);
 	plane.program.setUniformValue("mvp", plane.mvp);
 
 	//glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -361,6 +409,9 @@ void RenderWidget::updateLogic()
 	if (keyboardHelper.keyIsDown(Qt::Key_R))
 		resetCamera();
 
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_C))
+		renderCoordinates = !renderCoordinates;
+
 	QVector3D cameraRight = cameraMatrix.column(0).toVector3D();
 	QVector3D cameraUp = cameraMatrix.column(1).toVector3D();
 	QVector3D cameraForward = -cameraMatrix.column(2).toVector3D();
@@ -391,7 +442,7 @@ void RenderWidget::updateLogic()
 	QMatrix4x4 projectionMatrix;
 	projectionMatrix.setToIdentity();
 	float aspectRatio = float(width()) / float(height());
-	projectionMatrix.perspective(45.0f, aspectRatio, 0.1f, 100.0f);
+	projectionMatrix.perspective(45.0f, aspectRatio, 0.01f, 1000.0f);
 
 	cube.modelMatrix.setToIdentity();
 	cube.mvp = projectionMatrix * viewMatrix * cube.modelMatrix;
@@ -404,6 +455,9 @@ void RenderWidget::updateLogic()
 	plane.modelMatrix.setColumn(2, QVector4D(cameraForward.x(), cameraForward.y(), cameraForward.z(), 0.0f));
 	plane.modelMatrix.setColumn(3, QVector4D(planePosition.x(), planePosition.y(), planePosition.z(), 1.0f));
 	plane.mvp = projectionMatrix * viewMatrix * plane.modelMatrix;
+
+	coordinateLines.modelMatrix.setToIdentity();
+	coordinateLines.mvp = projectionMatrix * viewMatrix * coordinateLines.modelMatrix;
 }
 
 void RenderWidget::resetCamera()

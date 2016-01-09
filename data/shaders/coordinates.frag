@@ -3,11 +3,11 @@
 
 #version 330
 
-in vec3 position;
+in vec3 colorVarying;
 
-uniform mat4 mvp;
+out vec4 color;
 
 void main()
 {
-	gl_Position = mvp * vec4(position, 1.0f);
+	color = vec4(colorVarying, 0.5f);
 }

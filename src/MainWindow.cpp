@@ -162,20 +162,19 @@ void MainWindow::on_pushButtonLoadFullscreen_clicked()
 void MainWindow::on_pushButtonPickBackgroundColor_clicked()
 {
 	QColorDialog colorDialog;
-	QColor color = colorDialog.getColor(Qt::white, this, "Pick background color");
+	QColor color = colorDialog.getColor(Qt::white, this, "Pick background color", QColorDialog::ShowAlphaChannel);
 
 	if (color.isValid())
 	{
 		backgroundColor = color;
 		updateFrameColors();
 	}
-		
 }
 
 void MainWindow::on_pushButtonPickLineColor_clicked()
 {
 	QColorDialog colorDialog;
-	QColor color = colorDialog.getColor(Qt::white, this, "Pick line color");
+	QColor color = colorDialog.getColor(Qt::white, this, "Pick line color", QColorDialog::ShowAlphaChannel);
 
 	if (color.isValid())
 	{
