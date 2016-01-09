@@ -40,7 +40,7 @@ namespace CellVision
 
 	private:
 
-		Ui::MainWindowClass ui;
+		Ui::MainWindow ui;
 
 		QDoubleValidator doubleValueValidator;
 

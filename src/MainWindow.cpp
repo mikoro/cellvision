@@ -62,6 +62,14 @@ void MainWindow::keyPressEvent(QKeyEvent* ke)
 	if (ke->key() == Qt::Key_Escape)
 		close();
 
+	if (ke->key() == Qt::Key_F)
+	{
+		if (ui.splitterMain->sizes()[1] != 0)
+			ui.splitterMain->setSizes({ 1000, 0 });
+		else
+			ui.splitterMain->setSizes({ 1000, 1 });
+	}
+
 	ke->accept();
 }
 

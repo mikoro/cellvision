@@ -13,13 +13,7 @@
 #include <QOpenGLTexture>
 #include <QElapsedTimer>
 
-#include "ImageLoader.h"
 #include "KeyboardHelper.h"
-
-namespace Ui
-{
-	class MainWindowClass;
-}
 
 namespace CellVision
 {
