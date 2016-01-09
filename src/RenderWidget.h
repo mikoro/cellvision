@@ -61,8 +61,10 @@ namespace CellVision
 		QPoint previousMousePosition;
 		QElapsedTimer timeStepTimer;
 		QVector3D cameraPosition;
+		QVector2D cameraRotation;
 		QMatrix4x4 cameraMatrix;
 		float moveSpeedModifier = 1.0f;
+		float mouseSpeedModifier = 0.25f;
 
 		QOpenGLTexture volumeTexture;
 

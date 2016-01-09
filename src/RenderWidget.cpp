@@ -52,7 +52,21 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 	QPoint mouseDelta = me->globalPos() - previousMousePosition;
 	previousMousePosition = me->globalPos();
 
-	//tfm::printfln("x: %d y: %d", mouseDelta.x(), mouseDelta.y());
+	cameraRotation += QVector2D(-mouseDelta.x(), -mouseDelta.y()) * mouseSpeedModifier;
+
+	QMatrix4x4 rotateYaw;
+	QMatrix4x4 rotatePitch;
+
+	//QVector3D yawAxis = cameraMatrix.column(1).toVector3D();
+	//QVector3D pitchAxis = cameraMatrix.column(0).toVector3D();
+
+	QVector3D yawAxis = QVector3D(0, 1, 0);
+	QVector3D pitchAxis = QVector3D(1, 0, 0);
+
+	rotateYaw.rotate(cameraRotation.x(), yawAxis);
+	rotatePitch.rotate(cameraRotation.y(), pitchAxis);
+
+	cameraMatrix = rotateYaw * rotatePitch;
 
 	me->accept();
 }
@@ -270,6 +284,8 @@ void RenderWidget::paintGL()
 
 	// CUBE LINES //
 
+	glDisable(GL_DEPTH_TEST);
+
 	cubeLines.program.bind();
 	cubeLines.vao.bind();
 
@@ -328,6 +344,12 @@ void RenderWidget::updateLogic()
 	if (keyboardHelper.keyIsDown(Qt::Key_PageDown))
 		moveSpeedModifier *= 0.95f;
 
+	if (keyboardHelper.keyIsDown(Qt::Key_Home))
+		mouseSpeedModifier *= 1.05f;
+
+	if (keyboardHelper.keyIsDown(Qt::Key_End))
+		mouseSpeedModifier *= 0.95f;
+
 	float moveSpeed = 0.5f * moveSpeedModifier;
 
 	if (keyboardHelper.keyIsDown(Qt::Key_Shift))
@@ -362,7 +384,7 @@ void RenderWidget::updateLogic()
 		cameraPosition -= cameraUp * moveSpeed * timeStep;
 
 	QMatrix4x4 tempCameraMatrix = cameraMatrix;
-	tempCameraMatrix.translate(cameraPosition);
+	tempCameraMatrix.setColumn(3, QVector4D(cameraPosition.x(), cameraPosition.y(), cameraPosition.z(), 1.0f));
 
 	QMatrix4x4 viewMatrix = tempCameraMatrix.inverted();
 
@@ -387,4 +409,6 @@ void RenderWidget::updateLogic()
 void RenderWidget::resetCamera()
 {
 	cameraPosition = QVector3D(0.5f, 0.5f, 3.0f);
+	cameraRotation = QVector2D(0.0f, 0.0f);
+	cameraMatrix.setToIdentity();
 }
