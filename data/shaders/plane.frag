@@ -20,13 +20,13 @@ void main()
 	
 	texcoord.z = 1.0f - texcoord.z;
 	
-	color = texture(texture0, texcoord);
-	color.a = 1.0f;
-	
-	if (texcoord.x < 0.0f || texcoord.x > 1.0f
-	|| texcoord.y < 0.0f || texcoord.y > 1.0f
-	|| texcoord.z < 0.0f || texcoord.z > 1.0f)
+	if (texcoord.x < 0.0f || texcoord.x > 1.0f ||
+	texcoord.y < 0.0f || texcoord.y > 1.0f ||
+	texcoord.z < 0.0f || texcoord.z > 1.0f)
 	{
 		discard;
 	}
+	
+	color = texture(texture0, texcoord);
+	color.a = 1.0f;
 }

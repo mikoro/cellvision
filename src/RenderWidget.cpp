@@ -295,9 +295,17 @@ void RenderWidget::paintGL()
 	QVector3D realCameraPosition = cameraPosition * settings.imageWidth;
 	float realPlaneDistance = planeDistance * settings.imageWidth;
 
+	QFont font("mono", 10, QFont::Normal);
+	font.setHintingPreference(QFont::PreferFullHinting);
+	font.setStyleStrategy(QFont::PreferAntialias);
+
 	QPainter painter(this);
+	painter.setRenderHint(QPainter::Antialiasing);
+	painter.setRenderHint(QPainter::TextAntialiasing);
+	painter.setRenderHint(QPainter::SmoothPixmapTransform);
+	painter.setRenderHint(QPainter::HighQualityAntialiasing);
 	painter.setPen(Qt::white);
-	painter.setFont(QFont("monospace", 10, QFont::Normal));
+	painter.setFont(QFont("mono", 10, QFont::Normal));
 	painter.drawText(5, 15, QString("Camera position: (%1, %2, %3)").arg(locale.toString(realCameraPosition.x(), 'e', 6), locale.toString(realCameraPosition.y(), 'e', 6), locale.toString(realCameraPosition.z(), 'e', 6)));
 	painter.drawText(5, 32, QString("Plane distance: %1").arg(locale.toString(realPlaneDistance, 'e', 6)));
 }
