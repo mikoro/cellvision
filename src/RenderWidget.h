@@ -81,8 +81,6 @@ namespace CellVision
 		QVector3D cameraRight;
 		QVector3D cameraUp;
 		QVector3D cameraForward;
-		QVector3D cameraYawAxis;
-		QVector3D cameraPitchAxis;
 		MouseMode mouseMode = MouseMode::NONE;
 		float moveSpeedModifier = 1.0f;
 		float mouseSpeedModifier = 0.25f;

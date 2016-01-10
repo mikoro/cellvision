@@ -7,6 +7,7 @@
 #include "MainWindow.h"
 #include "Log.h"
 #include "ImageLoader.h"
+#include "MathHelper.h"
 
 using namespace CellVision;
 
@@ -117,21 +118,18 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 
 	if (mouseMode == MouseMode::ROTATE)
 	{
-		cameraRotation += QVector2D(-mouseDelta.x(), -mouseDelta.y()) * mouseSpeedModifier;
+		QVector2D rotation = QVector2D(-mouseDelta.x(), -mouseDelta.y()) * mouseSpeedModifier;
 
-		QMatrix4x4 rotateYaw;
-		QMatrix4x4 rotatePitch;
+		QVector3D cameraPitchAxis = cameraMatrix.column(0).toVector3D();
+		QVector3D cameraYawAxis = cameraMatrix.column(1).toVector3D();
 
-		//QVector3D yawAxis = cameraMatrix.column(1).toVector3D();
-		//QVector3D pitchAxis = cameraMatrix.column(0).toVector3D();
+		QMatrix4x4 rotateMatrix;
+		rotateMatrix.rotate(rotation.y(), cameraPitchAxis);
+		rotateMatrix.rotate(rotation.x(), cameraYawAxis);
+		
+		cameraMatrix *= rotateMatrix;
 
-		QVector3D yawAxis = QVector3D(0, 1, 0);
-		QVector3D pitchAxis = QVector3D(1, 0, 0);
-
-		rotateYaw.rotate(cameraRotation.x(), yawAxis);
-		rotatePitch.rotate(cameraRotation.y(), pitchAxis);
-
-		cameraMatrix = rotateYaw * rotatePitch;
+		MathHelper::orthonormalize(cameraMatrix);
 	}
 	else if (mouseMode == MouseMode::MOVE)
 	{
