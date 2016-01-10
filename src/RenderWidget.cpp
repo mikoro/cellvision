@@ -41,7 +41,6 @@ void RenderWidget::initialize(const RenderWidgetSettings& settings_)
 
 	std::array<QVector3D, 72> cubeVertexData;
 	std::array<QVector3D, 24> cubeLinesVertexData;
-
 	generateCubeVertices(cubeVertexData, cubeLinesVertexData, settings.imageWidth, settings.imageHeight, settings.imageDepth);
 
 	cube.vbo.bind();
@@ -68,7 +67,45 @@ void RenderWidget::mousePressEvent(QMouseEvent* me)
 {
 	setFocus();
 
+	if (me->buttons() == Qt::LeftButton)
+		mouseMode = MouseMode::ROTATE;
+	else if (me->buttons() == Qt::RightButton)
+		mouseMode = MouseMode::ORBIT;
+	else if (me->buttons() == (Qt::LeftButton | Qt::RightButton))
+		mouseMode = MouseMode::MOVE;
+	else if (me->buttons() == Qt::MidButton)
+		mouseMode = MouseMode::MEASURE;
+	else
+		mouseMode = MouseMode::NONE;
+
 	previousMousePosition = me->globalPos();
+
+	if (mouseMode == MouseMode::ORBIT)
+	{
+		QPointF point = me->localPos();
+		float x = point.x() / float(width());
+		float y = point.y() / float(height());
+		x = (x - 0.5f) * 2.0f;
+		y = (y - 0.5f) * -2.0f;
+
+		tfm::printfln("x: %f y: %f", x, y);
+	}
+
+	me->accept();
+}
+
+void RenderWidget::mouseReleaseEvent(QMouseEvent* me)
+{
+	if (me->buttons() == Qt::LeftButton)
+		mouseMode = MouseMode::ROTATE;
+	else if (me->buttons() == Qt::RightButton)
+		mouseMode = MouseMode::ORBIT;
+	else if (me->buttons() == (Qt::LeftButton | Qt::RightButton))
+		mouseMode = MouseMode::MOVE;
+	else if (me->buttons() == Qt::MidButton)
+		mouseMode = MouseMode::MEASURE;
+	else
+		mouseMode = MouseMode::NONE;
 
 	me->accept();
 }
@@ -78,21 +115,24 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 	QPoint mouseDelta = me->globalPos() - previousMousePosition;
 	previousMousePosition = me->globalPos();
 
-	cameraRotation += QVector2D(-mouseDelta.x(), -mouseDelta.y()) * mouseSpeedModifier;
+	if (mouseMode == MouseMode::ROTATE)
+	{
+		cameraRotation += QVector2D(-mouseDelta.x(), -mouseDelta.y()) * mouseSpeedModifier;
 
-	QMatrix4x4 rotateYaw;
-	QMatrix4x4 rotatePitch;
+		QMatrix4x4 rotateYaw;
+		QMatrix4x4 rotatePitch;
 
-	//QVector3D yawAxis = cameraMatrix.column(1).toVector3D();
-	//QVector3D pitchAxis = cameraMatrix.column(0).toVector3D();
+		//QVector3D yawAxis = cameraMatrix.column(1).toVector3D();
+		//QVector3D pitchAxis = cameraMatrix.column(0).toVector3D();
 
-	QVector3D yawAxis = QVector3D(0, 1, 0);
-	QVector3D pitchAxis = QVector3D(1, 0, 0);
+		QVector3D yawAxis = QVector3D(0, 1, 0);
+		QVector3D pitchAxis = QVector3D(1, 0, 0);
 
-	rotateYaw.rotate(cameraRotation.x(), yawAxis);
-	rotatePitch.rotate(cameraRotation.y(), pitchAxis);
+		rotateYaw.rotate(cameraRotation.x(), yawAxis);
+		rotatePitch.rotate(cameraRotation.y(), pitchAxis);
 
-	cameraMatrix = rotateYaw * rotatePitch;
+		cameraMatrix = rotateYaw * rotatePitch;
+	}
 
 	me->accept();
 }
@@ -118,12 +158,11 @@ void RenderWidget::initializeGL()
 
 	MainWindow::getLog().logInfo("OpenGL Vendor: %s | Renderer: %s | Version: %s | GLSL: %s", glGetString(GL_VENDOR), glGetString(GL_RENDERER), glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));;
 
+	// CUBE //
+
 	std::array<QVector3D, 72> cubeVertexData;
 	std::array<QVector3D, 24> cubeLinesVertexData;
-
 	generateCubeVertices(cubeVertexData, cubeLinesVertexData, 1.0f, 1.0f, 1.0f);
-
-	// CUBE LINES //
 
 	cube.program.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/cube.vert");
 	cube.program.addShaderFromSourceFile(QOpenGLShader::Fragment, "data/shaders/cube.frag");
@@ -178,9 +217,9 @@ void RenderWidget::initializeGL()
 	plane.vbo.release();
 	plane.program.release();
 
-	// COORDINATE LINES //
+	// COORDINATES //
 	
-	const float coordinateLinesVertexData[] =
+	const float coordinatesVertexData[] =
 	{
 		-10.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, 10.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
 		0.0f, -10.0f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, 10.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
@@ -195,7 +234,7 @@ void RenderWidget::initializeGL()
 	coordinates.vbo.create();
 	coordinates.vbo.bind();
 	coordinates.vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-	coordinates.vbo.allocate(coordinateLinesVertexData, sizeof(coordinateLinesVertexData));
+	coordinates.vbo.allocate(coordinatesVertexData, sizeof(coordinatesVertexData));
 
 	coordinates.vao.create();
 	coordinates.vao.bind();
@@ -274,7 +313,7 @@ void RenderWidget::paintGL()
 		background.program.release();
 	}
 
-	// COORDINATE LINES //
+	// COORDINATES //
 
 	if (renderCoordinates)
 	{
@@ -289,7 +328,7 @@ void RenderWidget::paintGL()
 		coordinates.program.release();
 	}
 
-	// CUBE LINES //
+	// CUBE //
 
 	cube.program.bind();
 	cube.vao.bind();

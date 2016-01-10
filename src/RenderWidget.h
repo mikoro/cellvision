@@ -37,6 +37,8 @@ namespace CellVision
 		float imageDepth = 1.0f;
 	};
 
+	enum class MouseMode { NONE, ROTATE, ORBIT, MOVE, MEASURE };
+
 	class RenderWidget : public QOpenGLWidget, protected QOpenGLFunctions
 	{
 		Q_OBJECT
@@ -52,6 +54,7 @@ namespace CellVision
 		bool event(QEvent* e) override;
 
 		void mousePressEvent(QMouseEvent* me) override;
+		void mouseReleaseEvent(QMouseEvent* me) override;
 		void mouseMoveEvent(QMouseEvent* me) override;
 		void wheelEvent(QWheelEvent* we) override;
 
@@ -75,6 +78,9 @@ namespace CellVision
 		QVector3D cameraPosition;
 		QVector2D cameraRotation;
 		QMatrix4x4 cameraMatrix;
+		QVector3D cameraYawAxis;
+		QVector3D cameraPitchAxis;
+		MouseMode mouseMode = MouseMode::NONE;
 		float moveSpeedModifier = 1.0f;
 		float mouseSpeedModifier = 0.25f;
 		float mouseWheelSpeedModifier = 0.05f;

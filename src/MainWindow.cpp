@@ -172,6 +172,8 @@ void MainWindow::on_pushButtonLoadWindowed_clicked()
 
 void MainWindow::on_pushButtonLoadFullscreen_clicked()
 {
+	this->setCursor(Qt::WaitCursor);
+
 	QDialog* dialog = new QDialog(this);
 	QHBoxLayout* layout = new QHBoxLayout(dialog);
 	RenderWidget* renderWidget = new RenderWidget(dialog);
@@ -209,6 +211,8 @@ void MainWindow::on_pushButtonLoadFullscreen_clicked()
 
 	renderWidget->initialize(settings);
 	renderWidget->setFocus();
+
+	this->setCursor(Qt::ArrowCursor);
 }
 
 void MainWindow::on_pushButtonPickBackgroundColor_clicked()
