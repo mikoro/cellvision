@@ -13,17 +13,19 @@ uniform float scaleZ;
 
 void main()
 {
-	vec3 wp = worldPositionVarying;
+	vec3 texcoord = worldPositionVarying;
 	
-	wp.y /= scaleY;
-	wp.z /= scaleZ;
+	texcoord.y /= scaleY;
+	texcoord.z /= scaleZ;
 	
-	color = texture(texture0, wp);
+	texcoord.z = 1.0f - texcoord.z;
+	
+	color = texture(texture0, texcoord);
 	color.a = 1.0f;
 	
-	if (wp.x < 0.0f || wp.x > 1.0f
-	|| wp.y < 0.0f || wp.y > 1.0f
-	|| wp.z < 0.0f || wp.z > 1.0f)
+	if (texcoord.x < 0.0f || texcoord.x > 1.0f
+	|| texcoord.y < 0.0f || texcoord.y > 1.0f
+	|| texcoord.z < 0.0f || texcoord.z > 1.0f)
 	{
 		discard;
 	}
