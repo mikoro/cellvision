@@ -14,6 +14,7 @@
 #include <QElapsedTimer>
 
 #include "KeyboardHelper.h"
+#include "ImageLoader.h"
 
 namespace CellVision
 {
@@ -28,7 +29,7 @@ namespace CellVision
 
 	struct RenderWidgetSettings
 	{
-		std::string imageFileName;
+		ImageLoaderInfo imageLoaderInfo;
 		QColor backgroundColor = QColor(100, 100, 100, 255);
 		QColor lineColor = QColor(255, 255, 255, 128);
 		float imageWidth = 1.0f;
@@ -75,12 +76,12 @@ namespace CellVision
 		QMatrix4x4 cameraMatrix;
 		float moveSpeedModifier = 1.0f;
 		float mouseSpeedModifier = 0.25f;
+		float mouseWheelSpeedModifier = 0.05f;
 		float planeDistance = 1.0f;
 		bool renderCoordinates = true;
 
 		QOpenGLTexture volumeTexture;
 
-		OpenGLData cube;
 		OpenGLData cubeLines;
 		OpenGLData plane;
 		OpenGLData coordinateLines;

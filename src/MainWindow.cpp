@@ -6,6 +6,7 @@
 #include "MainWindow.h"
 #include "Log.h"
 #include "MetadataLoader.h"
+#include "ImageLoader.h"
 
 using namespace CellVision;
 
@@ -144,8 +145,19 @@ void MainWindow::on_pushButtonLoadWindowed_clicked()
 
 	QLocale locale(QLocale::English);
 
+	ImageLoaderInfo info;
+	info.fileName = ui.lineEditTiffImageFileName->text().toStdString();
+	info.channelCount = ui.spinBoxChannelCount->value();
+	info.imagesPerChannel = ui.spinBoxImagesPerChannel->value();
+	info.redChannelEnabled = ui.checkBoxRedChannelEnabled->isChecked();
+	info.greenChannelEnabled = ui.checkBoxGreenChannelEnabled->isChecked();
+	info.blueChannelEnabled = ui.checkBoxBlueChannelEnabled->isChecked();
+	info.redChannelIndex = ui.spinBoxRedChannel->value();
+	info.greenChannelIndex = ui.spinBoxGreenChannel->value();
+	info.blueChannelIndex = ui.spinBoxBlueChannel->value();
+
 	RenderWidgetSettings settings;
-	settings.imageFileName = ui.lineEditTiffImageFileName->text().toStdString();
+	settings.imageLoaderInfo = info;
 	settings.backgroundColor = backgroundColor;
 	settings.lineColor = lineColor;
 	settings.imageWidth = locale.toFloat(ui.lineEditImageWidth->text());
@@ -153,6 +165,7 @@ void MainWindow::on_pushButtonLoadWindowed_clicked()
 	settings.imageDepth = locale.toFloat(ui.lineEditImageDepth->text());
 
 	ui.renderWidget->initialize(settings);
+	ui.renderWidget->setFocus();
 
 	this->setCursor(Qt::ArrowCursor);
 }
@@ -177,7 +190,7 @@ void MainWindow::on_pushButtonLoadFullscreen_clicked()
 void MainWindow::on_pushButtonPickBackgroundColor_clicked()
 {
 	QColorDialog colorDialog;
-	QColor color = colorDialog.getColor(Qt::white, this, "Pick background color", QColorDialog::ShowAlphaChannel);
+	QColor color = colorDialog.getColor(backgroundColor, this, "Pick background color", QColorDialog::ShowAlphaChannel);
 
 	if (color.isValid())
 	{
@@ -189,7 +202,7 @@ void MainWindow::on_pushButtonPickBackgroundColor_clicked()
 void MainWindow::on_pushButtonPickLineColor_clicked()
 {
 	QColorDialog colorDialog;
-	QColor color = colorDialog.getColor(Qt::white, this, "Pick line color", QColorDialog::ShowAlphaChannel);
+	QColor color = colorDialog.getColor(lineColor, this, "Pick line color", QColorDialog::ShowAlphaChannel);
 
 	if (color.isValid())
 	{

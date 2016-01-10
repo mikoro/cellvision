@@ -8,16 +8,23 @@ in vec3 worldPositionVarying;
 out vec4 color;
 
 uniform sampler3D texture0;
+uniform float scaleY;
+uniform float scaleZ;
 
 void main()
 {
-	color = texture(texture0, worldPositionVarying);
+	vec3 wp = worldPositionVarying;
+	
+	wp.y /= scaleY;
+	wp.z /= scaleZ;
+	
+	color = texture(texture0, wp);
 	color.a = 1.0f;
 	
-	if (worldPositionVarying.x < 0.0f || worldPositionVarying.x > 1.0f
-	|| worldPositionVarying.y < 0.0f || worldPositionVarying.y > 1.0f
-	|| worldPositionVarying.z < 0.0f || worldPositionVarying.z > 1.0f)
+	if (wp.x < 0.0f || wp.x > 1.0f
+	|| wp.y < 0.0f || wp.y > 1.0f
+	|| wp.z < 0.0f || wp.z > 1.0f)
 	{
-		color.a = 0.5f;
+		discard;
 	}
 }

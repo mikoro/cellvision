@@ -21,25 +21,22 @@ void RenderWidget::initialize(const RenderWidgetSettings& settings_)
 {
 	settings = settings_;
 
-	if (!settings.imageFileName.empty())
-	{
-		ImageLoaderResult result = ImageLoader::loadFromMultipageTiff(settings.imageFileName, 0, 0, 0);
+	ImageLoaderResult result = ImageLoader::loadFromMultipageTiff(settings.imageLoaderInfo);
 
-		if (result.data.size() > 0)
-		{
-			volumeTexture.destroy();
-			volumeTexture.create();
-			volumeTexture.bind();
-			volumeTexture.setFormat(QOpenGLTexture::RGBA8_UNorm);
-			volumeTexture.setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
-			volumeTexture.setWrapMode(QOpenGLTexture::ClampToBorder);
-			volumeTexture.setBorderColor(0.0f, 0.0f, 0.0f, 1.0f);
-			volumeTexture.setMipLevels(1);
-			volumeTexture.setSize(result.width, result.height, result.depth);
-			volumeTexture.allocateStorage(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8);
-			volumeTexture.setData(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, &result.data[0]);
-			volumeTexture.release();
-		}
+	if (result.data.size() > 0)
+	{
+		volumeTexture.destroy();
+		volumeTexture.create();
+		volumeTexture.bind();
+		volumeTexture.setFormat(QOpenGLTexture::RGBA8_UNorm);
+		volumeTexture.setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
+		volumeTexture.setWrapMode(QOpenGLTexture::ClampToBorder);
+		volumeTexture.setBorderColor(0.0f, 0.0f, 0.0f, 1.0f);
+		volumeTexture.setMipLevels(1);
+		volumeTexture.setSize(result.width, result.height, result.depth);
+		volumeTexture.allocateStorage(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8);
+		volumeTexture.setData(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, &result.data[0]);
+		volumeTexture.release();
 	}
 
 	std::array<QVector3D, 72> cubeVertexData;
@@ -47,13 +44,11 @@ void RenderWidget::initialize(const RenderWidgetSettings& settings_)
 
 	generateCubeVertices(cubeVertexData, cubeLinesVertexData, settings.imageWidth, settings.imageHeight, settings.imageDepth);
 
-	cube.vbo.bind();
-	cube.vbo.write(0, cubeVertexData.data(), sizeof(cubeVertexData));
-	cube.vbo.release();
-
 	cubeLines.vbo.bind();
 	cubeLines.vbo.write(0, cubeLinesVertexData.data(), sizeof(cubeLinesVertexData));
 	cubeLines.vbo.release();
+
+	resetCamera();
 }
 
 bool RenderWidget::event(QEvent* e)
@@ -97,7 +92,7 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 
 void RenderWidget::wheelEvent(QWheelEvent* we)
 {
-	float moveSpeed = moveSpeedModifier;
+	float moveSpeed = mouseWheelSpeedModifier;
 
 	if (keyboardHelper.keyIsDown(Qt::Key_Shift))
 		moveSpeed *= 2.0f;
@@ -105,7 +100,7 @@ void RenderWidget::wheelEvent(QWheelEvent* we)
 	if (keyboardHelper.keyIsDown(Qt::Key_Control))
 		moveSpeed *= 0.5f;
 
-	planeDistance += we->angleDelta().y() / 120.0f * 0.05f * moveSpeed;
+	planeDistance += we->angleDelta().y() / 120.0f * moveSpeed;
 
 	we->accept();
 }
@@ -120,30 +115,6 @@ void RenderWidget::initializeGL()
 	std::array<QVector3D, 24> cubeLinesVertexData;
 
 	generateCubeVertices(cubeVertexData, cubeLinesVertexData, 1.0f, 1.0f, 1.0f);
-
-	// CUBE //
-
-	cube.program.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/cube.vert");
-	cube.program.addShaderFromSourceFile(QOpenGLShader::Fragment, "data/shaders/cube.frag");
-	cube.program.link();
-	cube.program.bind();
-
-	cube.vbo.create();
-	cube.vbo.bind();
-	cube.vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-	cube.vbo.allocate(cubeVertexData.data(), sizeof(cubeVertexData));
-
-	cube.vao.create();
-	cube.vao.bind();
-
-	cube.program.enableAttributeArray("position");
-	cube.program.enableAttributeArray("texcoord");
-	cube.program.setAttributeBuffer("position", GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
-	cube.program.setAttributeBuffer("texcoord", GL_FLOAT, 3 * sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
-
-	cube.vao.release();
-	cube.vbo.release();
-	cube.program.release();
 
 	// CUBE LINES //
 
@@ -280,25 +251,6 @@ void RenderWidget::paintGL()
 		coordinateLines.program.release();
 	}
 
-	// CUBE //
-
-	cube.program.bind();
-	cube.vao.bind();
-
-	if (volumeTexture.isCreated())
-		volumeTexture.bind();
-
-	cube.program.setUniformValue("texture0", 0);
-	cube.program.setUniformValue("mvp", cube.mvp);
-
-	//glDrawArrays(GL_TRIANGLES, 0, 36);
-
-	if (volumeTexture.isCreated())
-		volumeTexture.release();
-
-	cube.vao.release();
-	cube.program.release();
-
 	// CUBE LINES //
 
 	glDisable(GL_DEPTH_TEST);
@@ -307,7 +259,7 @@ void RenderWidget::paintGL()
 	cubeLines.vao.bind();
 
 	cubeLines.program.setUniformValue("lineColor", settings.lineColor);
-	cubeLines.program.setUniformValue("mvp", cube.mvp);
+	cubeLines.program.setUniformValue("mvp", cubeLines.mvp);
 
 	glDrawArrays(GL_LINES, 0, 24);
 
@@ -327,6 +279,8 @@ void RenderWidget::paintGL()
 	plane.program.setUniformValue("texture0", 0);
 	plane.program.setUniformValue("modelMatrix", plane.modelMatrix);
 	plane.program.setUniformValue("mvp", plane.mvp);
+	plane.program.setUniformValue("scaleY", settings.imageHeight / settings.imageWidth);
+	plane.program.setUniformValue("scaleZ", settings.imageDepth / settings.imageWidth);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -403,17 +357,23 @@ void RenderWidget::updateLogic()
 	float timeStep = timeStepTimer.nsecsElapsed() / 1000000000.0f;
 	timeStepTimer.restart();
 
-	if (keyboardHelper.keyIsDownOnce(Qt::Key_PageUp))
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_U))
 		moveSpeedModifier *= 2.0f;
 
-	if (keyboardHelper.keyIsDownOnce(Qt::Key_PageDown))
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_J))
 		moveSpeedModifier *= 0.5f;
 
-	if (keyboardHelper.keyIsDownOnce(Qt::Key_Home))
-		moveSpeedModifier *= 2.0f;
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_I))
+		mouseSpeedModifier *= 2.0f;
 
-	if (keyboardHelper.keyIsDownOnce(Qt::Key_End))
-		moveSpeedModifier *= 0.5f;
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_K))
+		mouseSpeedModifier *= 0.5f;
+
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_O))
+		mouseWheelSpeedModifier *= 2.0f;
+
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_L))
+		mouseWheelSpeedModifier *= 0.5f;
 
 	float moveSpeed = moveSpeedModifier;
 
@@ -461,8 +421,8 @@ void RenderWidget::updateLogic()
 	float aspectRatio = float(width()) / float(height());
 	projectionMatrix.perspective(45.0f, aspectRatio, 0.01f, 1000.0f);
 
-	cube.modelMatrix.setToIdentity();
-	cube.mvp = projectionMatrix * viewMatrix * cube.modelMatrix;
+	cubeLines.modelMatrix.setToIdentity();
+	cubeLines.mvp = projectionMatrix * viewMatrix * cubeLines.modelMatrix;
 
 	QVector3D planePosition = cameraPosition + planeDistance * cameraForward;
 
@@ -479,8 +439,16 @@ void RenderWidget::updateLogic()
 
 void RenderWidget::resetCamera()
 {
-	cameraPosition = QVector3D(0.5f, 0.5f, 2.3f);
+	float distance = 2.3f;
+	float depth = settings.imageDepth / settings.imageWidth;
+
+	cameraPosition = QVector3D(0.5f, 0.5f, distance);
 	cameraRotation = QVector2D(0.0f, 0.0f);
-	planeDistance = 1.8f;
 	cameraMatrix.setToIdentity();
+
+	planeDistance = distance - depth / 2.0f;
+
+	moveSpeedModifier = 1.0f;
+	mouseSpeedModifier = 0.25f;
+	mouseWheelSpeedModifier = 0.05f;
 }
