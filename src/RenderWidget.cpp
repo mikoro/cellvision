@@ -133,6 +133,18 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 
 		cameraMatrix = rotateYaw * rotatePitch;
 	}
+	else if (mouseMode == MouseMode::MOVE)
+	{
+		float moveSpeed = mouseSpeedModifier * 0.05f;
+
+		if (keyboardHelper.keyIsDown(Qt::Key_Shift))
+			moveSpeed *= 2.0f;
+
+		if (keyboardHelper.keyIsDown(Qt::Key_Control))
+			moveSpeed *= 0.5f;
+
+		cameraPosition += cameraForward * -mouseDelta.y() * moveSpeed;
+	}
 
 	me->accept();
 }
@@ -513,9 +525,9 @@ void RenderWidget::updateLogic()
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_C))
 		renderCoordinates = !renderCoordinates;
 
-	QVector3D cameraRight = cameraMatrix.column(0).toVector3D();
-	QVector3D cameraUp = cameraMatrix.column(1).toVector3D();
-	QVector3D cameraForward = -cameraMatrix.column(2).toVector3D();
+	cameraRight = cameraMatrix.column(0).toVector3D();
+	cameraUp = cameraMatrix.column(1).toVector3D();
+	cameraForward = -cameraMatrix.column(2).toVector3D();
 
 	if (keyboardHelper.keyIsDown(Qt::Key_W) || keyboardHelper.keyIsDown(Qt::Key_Up))
 		cameraPosition += cameraForward * moveSpeed * timeStep;
