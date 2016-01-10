@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <vector>
 
+#include "tiffio.h"
+
 namespace CellVision
 {
 	struct ImageLoaderInfo

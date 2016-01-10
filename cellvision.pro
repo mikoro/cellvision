@@ -20,19 +20,27 @@ LIBPATH += /opt/local/lib
 
 HEADERS += src/Common.h \
            src/ImageLoader.h \
+		   src/KeyboardHelper.h \
            src/Log.h \
            src/MainWindow.h \
+		   src/MathHelper.h \
+		   src/MetadataLoader.h \
            src/RenderWidget.h \
            src/stdafx.h \
+		   src/StringUtils.h \
            src/SysUtils.h
 
 FORMS += src/MainWindow.ui
 
 SOURCES += src/ImageLoader.cpp \
+           src/KeyboardHelper.cpp \
            src/Log.cpp \
            src/Main.cpp \
            src/MainWindow.cpp \
+		   src/MathHelper.cpp \
+		   src/MetadataLoader.cpp \
            src/RenderWidget.cpp \
+		   src/StringUtils.cpp \
            src/SysUtils.cpp
 
 RESOURCES += src/MainWindow.qrc
