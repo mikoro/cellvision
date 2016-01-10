@@ -4,10 +4,15 @@
 #version 330
 
 in vec3 colorVarying;
+in float distanceVarying;
 
 out vec4 color;
 
 void main()
 {
-	color = vec4(colorVarying, 0.5f);
+	float distance = abs(distanceVarying);
+	distance = distance * distance;
+	float alpha = (1.0f - distance) * 0.5f;
+	
+	color = vec4(colorVarying, alpha);
 }

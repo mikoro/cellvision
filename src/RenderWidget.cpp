@@ -179,23 +179,12 @@ void RenderWidget::initializeGL()
 	plane.program.release();
 
 	// COORDINATE LINES //
-
-	v1 = QVector3D(-1000, 0, 0);
-	v2 = QVector3D(1000, 0, 0);
-	v3 = QVector3D(0, -1000, 0);
-	v4 = QVector3D(0, 1000, 0);
-	QVector3D v5(0, 0, -1000);
-	QVector3D v6(0, 0, 1000);
 	
-	QVector3D c1(1, 0, 0);
-	QVector3D c2(0, 1, 0);
-	QVector3D c3(0, 0, 1);
-
-	const QVector3D coordinateLinesVertexData[] =
+	const float coordinateLinesVertexData[] =
 	{
-		v1, c1, v2, c1,
-		v3, c2, v4, c2,
-		v5, c3, v6, c3
+		-10.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, 10.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+		0.0f, -10.0f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, 10.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, -10.0f, 0.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 10.0f, 0.0f, 0.0f, 1.0f, 1.0f
 	};
 
 	coordinates.program.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/coordinates.vert");
@@ -213,8 +202,10 @@ void RenderWidget::initializeGL()
 
 	coordinates.program.enableAttributeArray("position");
 	coordinates.program.enableAttributeArray("color");
-	coordinates.program.setAttributeBuffer("position", GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
-	coordinates.program.setAttributeBuffer("color", GL_FLOAT, 3 * sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
+	coordinates.program.enableAttributeArray("distance");
+	coordinates.program.setAttributeBuffer("position", GL_FLOAT, 0, 3, 7 * sizeof(GLfloat));
+	coordinates.program.setAttributeBuffer("color", GL_FLOAT, 3 * sizeof(GLfloat), 3, 7 * sizeof(GLfloat));
+	coordinates.program.setAttributeBuffer("distance", GL_FLOAT, 6 * sizeof(GLfloat), 1, 7 * sizeof(GLfloat));
 
 	coordinates.vao.release();
 	coordinates.vbo.release();
@@ -513,7 +504,7 @@ void RenderWidget::updateLogic()
 	QMatrix4x4 projectionMatrix;
 	projectionMatrix.setToIdentity();
 	float aspectRatio = float(width()) / float(height());
-	projectionMatrix.perspective(45.0f, aspectRatio, 0.01f, 1000.0f);
+	projectionMatrix.perspective(45.0f, aspectRatio, 0.001f, 100.0f);
 
 	cube.modelMatrix.setToIdentity();
 	cube.mvp = projectionMatrix * viewMatrix * cube.modelMatrix;
