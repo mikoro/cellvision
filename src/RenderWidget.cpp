@@ -44,9 +44,16 @@ void RenderWidget::initialize(const RenderWidgetSettings& settings_)
 
 	generateCubeVertices(cubeVertexData, cubeLinesVertexData, settings.imageWidth, settings.imageHeight, settings.imageDepth);
 
-	cubeLines.vbo.bind();
-	cubeLines.vbo.write(0, cubeLinesVertexData.data(), sizeof(cubeLinesVertexData));
-	cubeLines.vbo.release();
+	cube.vbo.bind();
+	cube.vbo.write(0, cubeLinesVertexData.data(), sizeof(cubeLinesVertexData));
+	cube.vbo.release();
+
+	std::array<float, 30> backgroundVertexData;
+	generateBackgroundVertices(backgroundVertexData, settings.backgroundColor);
+
+	background.vbo.bind();
+	background.vbo.write(0, backgroundVertexData.data(), sizeof(backgroundVertexData));
+	background.vbo.release();
 
 	resetCamera();
 }
@@ -118,25 +125,25 @@ void RenderWidget::initializeGL()
 
 	// CUBE LINES //
 
-	cubeLines.program.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/lines.vert");
-	cubeLines.program.addShaderFromSourceFile(QOpenGLShader::Fragment, "data/shaders/lines.frag");
-	cubeLines.program.link();
-	cubeLines.program.bind();
+	cube.program.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/cube.vert");
+	cube.program.addShaderFromSourceFile(QOpenGLShader::Fragment, "data/shaders/cube.frag");
+	cube.program.link();
+	cube.program.bind();
 
-	cubeLines.vbo.create();
-	cubeLines.vbo.bind();
-	cubeLines.vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-	cubeLines.vbo.allocate(cubeLinesVertexData.data(), sizeof(cubeLinesVertexData));
+	cube.vbo.create();
+	cube.vbo.bind();
+	cube.vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
+	cube.vbo.allocate(cubeLinesVertexData.data(), sizeof(cubeLinesVertexData));
 
-	cubeLines.vao.create();
-	cubeLines.vao.bind();
+	cube.vao.create();
+	cube.vao.bind();
 
-	cubeLines.program.enableAttributeArray("position");
-	cubeLines.program.setAttributeBuffer("position", GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
+	cube.program.enableAttributeArray("position");
+	cube.program.setAttributeBuffer("position", GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
 
-	cubeLines.vao.release();
-	cubeLines.vbo.release();
-	cubeLines.program.release();
+	cube.vao.release();
+	cube.vbo.release();
+	cube.program.release();
 
 	// PLANE //
 
@@ -191,27 +198,54 @@ void RenderWidget::initializeGL()
 		v5, c3, v6, c3
 	};
 
-	coordinateLines.program.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/coordinates.vert");
-	coordinateLines.program.addShaderFromSourceFile(QOpenGLShader::Fragment, "data/shaders/coordinates.frag");
-	coordinateLines.program.link();
-	coordinateLines.program.bind();
+	coordinates.program.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/coordinates.vert");
+	coordinates.program.addShaderFromSourceFile(QOpenGLShader::Fragment, "data/shaders/coordinates.frag");
+	coordinates.program.link();
+	coordinates.program.bind();
 
-	coordinateLines.vbo.create();
-	coordinateLines.vbo.bind();
-	coordinateLines.vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-	coordinateLines.vbo.allocate(coordinateLinesVertexData, sizeof(coordinateLinesVertexData));
+	coordinates.vbo.create();
+	coordinates.vbo.bind();
+	coordinates.vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
+	coordinates.vbo.allocate(coordinateLinesVertexData, sizeof(coordinateLinesVertexData));
 
-	coordinateLines.vao.create();
-	coordinateLines.vao.bind();
+	coordinates.vao.create();
+	coordinates.vao.bind();
 
-	coordinateLines.program.enableAttributeArray("position");
-	coordinateLines.program.enableAttributeArray("color");
-	coordinateLines.program.setAttributeBuffer("position", GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
-	coordinateLines.program.setAttributeBuffer("color", GL_FLOAT, 3 * sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
+	coordinates.program.enableAttributeArray("position");
+	coordinates.program.enableAttributeArray("color");
+	coordinates.program.setAttributeBuffer("position", GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
+	coordinates.program.setAttributeBuffer("color", GL_FLOAT, 3 * sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
 
-	coordinateLines.vao.release();
-	coordinateLines.vbo.release();
-	coordinateLines.program.release();
+	coordinates.vao.release();
+	coordinates.vbo.release();
+	coordinates.program.release();
+
+	// BACKGROUND //
+
+	std::array<float, 30> backgroundVertexData;
+	generateBackgroundVertices(backgroundVertexData, settings.backgroundColor);
+
+	background.program.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/background.vert");
+	background.program.addShaderFromSourceFile(QOpenGLShader::Fragment, "data/shaders/background.frag");
+	background.program.link();
+	background.program.bind();
+
+	background.vbo.create();
+	background.vbo.bind();
+	background.vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
+	background.vbo.allocate(backgroundVertexData.data(), sizeof(backgroundVertexData));
+
+	background.vao.create();
+	background.vao.bind();
+
+	background.program.enableAttributeArray("position");
+	background.program.enableAttributeArray("color");
+	background.program.setAttributeBuffer("position", GL_FLOAT, 0, 2, 5 * sizeof(GLfloat));
+	background.program.setAttributeBuffer("color", GL_FLOAT, 2 * sizeof(GLfloat), 3, 5 * sizeof(GLfloat));
+
+	background.vao.release();
+	background.vbo.release();
+	background.program.release();
 
 	// MISC //
 
@@ -229,44 +263,53 @@ void RenderWidget::paintGL()
 
 	glClearColor(settings.backgroundColor.redF(), settings.backgroundColor.greenF(), settings.backgroundColor.blueF(), settings.backgroundColor.alphaF());
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_LINE_SMOOTH);
 	glLineWidth(4.0f);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	// BACKGROUND //
+
+	if (renderBackground)
+	{
+		background.program.bind();
+		background.vao.bind();
+
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		background.vao.release();
+		background.program.release();
+	}
+
 	// COORDINATE LINES //
 
 	if (renderCoordinates)
 	{
-		coordinateLines.program.bind();
-		coordinateLines.vao.bind();
+		coordinates.program.bind();
+		coordinates.vao.bind();
 
-		coordinateLines.program.setUniformValue("mvp", coordinateLines.mvp);
+		coordinates.program.setUniformValue("mvp", coordinates.mvp);
 
 		glDrawArrays(GL_LINES, 0, 6);
 
-		coordinateLines.vao.release();
-		coordinateLines.program.release();
+		coordinates.vao.release();
+		coordinates.program.release();
 	}
 
 	// CUBE LINES //
 
-	glDisable(GL_DEPTH_TEST);
+	cube.program.bind();
+	cube.vao.bind();
 
-	cubeLines.program.bind();
-	cubeLines.vao.bind();
-
-	cubeLines.program.setUniformValue("lineColor", settings.lineColor);
-	cubeLines.program.setUniformValue("mvp", cubeLines.mvp);
+	cube.program.setUniformValue("lineColor", settings.lineColor);
+	cube.program.setUniformValue("mvp", cube.mvp);
 
 	glDrawArrays(GL_LINES, 0, 24);
 
-	cubeLines.vao.release();
-	cubeLines.program.release();
-
-	glEnable(GL_DEPTH_TEST);
+	cube.vao.release();
+	cube.program.release();
 
 	// PLANE //
 
@@ -289,6 +332,8 @@ void RenderWidget::paintGL()
 
 	plane.vao.release();
 	plane.program.release();
+
+	// TEXTS //
 
 	QLocale locale(QLocale::English);
 
@@ -371,6 +416,33 @@ void RenderWidget::generateCubeVertices(std::array<QVector3D, 72>& cubeVertexDat
 	cubeLinesVertexData = cubeLinesVertexDataTemp;
 }
 
+void RenderWidget::generateBackgroundVertices(std::array<float, 30>& backgroundVertexData, QColor color)
+{
+	float alpha1 = 0.6f;
+	float alpha2 = 1.4f;
+
+	float red1 = std::max(0.0f, std::min(1.0f, float(alpha1 * color.redF())));
+	float green1 = std::max(0.0f, std::min(1.0f, float(alpha1 * color.greenF())));
+	float blue1 = std::max(0.0f, std::min(1.0f, float(alpha1 * color.blueF())));
+
+	float red2 = std::max(0.0f, std::min(1.0f, float(alpha2 * color.redF())));
+	float green2 = std::max(0.0f, std::min(1.0f, float(alpha2 * color.greenF())));
+	float blue2 = std::max(0.0f, std::min(1.0f, float(alpha2 * color.blueF())));
+
+	std::array<float, 30> backgroundVertexDataTemp =
+	{
+		-1.0f, -1.0f, red1, green1, blue1,
+		1.0f, -1.0f, red1, green1, blue1,
+		1.0f, 1.0f, red2, green2, blue2,
+
+		-1.0f, -1.0f, red1, green1, blue1,
+		1.0f, 1.0f, red2, green2, blue2,
+		-1.0f, 1.0f, red2, green2, blue2,
+	};
+
+	backgroundVertexData = backgroundVertexDataTemp;
+}
+
 void RenderWidget::updateLogic()
 {
 	float timeStep = timeStepTimer.nsecsElapsed() / 1000000000.0f;
@@ -404,6 +476,9 @@ void RenderWidget::updateLogic()
 
 	if (keyboardHelper.keyIsDown(Qt::Key_R))
 		resetCamera();
+
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_B))
+		renderBackground = !renderBackground;
 
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_C))
 		renderCoordinates = !renderCoordinates;
@@ -440,8 +515,8 @@ void RenderWidget::updateLogic()
 	float aspectRatio = float(width()) / float(height());
 	projectionMatrix.perspective(45.0f, aspectRatio, 0.01f, 1000.0f);
 
-	cubeLines.modelMatrix.setToIdentity();
-	cubeLines.mvp = projectionMatrix * viewMatrix * cubeLines.modelMatrix;
+	cube.modelMatrix.setToIdentity();
+	cube.mvp = projectionMatrix * viewMatrix * cube.modelMatrix;
 
 	QVector3D planePosition = cameraPosition + planeDistance * cameraForward;
 
@@ -452,8 +527,8 @@ void RenderWidget::updateLogic()
 	plane.modelMatrix.setColumn(3, QVector4D(planePosition.x(), planePosition.y(), planePosition.z(), 1.0f));
 	plane.mvp = projectionMatrix * viewMatrix * plane.modelMatrix;
 
-	coordinateLines.modelMatrix.setToIdentity();
-	coordinateLines.mvp = projectionMatrix * viewMatrix * coordinateLines.modelMatrix;
+	coordinates.modelMatrix.setToIdentity();
+	coordinates.mvp = projectionMatrix * viewMatrix * coordinates.modelMatrix;
 }
 
 void RenderWidget::resetCamera()

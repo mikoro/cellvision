@@ -6,6 +6,7 @@
 #include <fstream>
 #include <vector>
 #include <cstdint>
+#include <algorithm>
 
 #include <QtCore>
 #include <QtWidgets>
