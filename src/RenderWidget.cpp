@@ -289,6 +289,17 @@ void RenderWidget::paintGL()
 
 	plane.vao.release();
 	plane.program.release();
+
+	QLocale locale(QLocale::English);
+
+	QVector3D realCameraPosition = cameraPosition * settings.imageWidth;
+	float realPlaneDistance = planeDistance * settings.imageWidth;
+
+	QPainter painter(this);
+	painter.setPen(Qt::white);
+	painter.setFont(QFont("monospace", 10, QFont::Normal));
+	painter.drawText(5, 15, QString("Camera position: (%1, %2, %3)").arg(locale.toString(realCameraPosition.x(), 'e', 6), locale.toString(realCameraPosition.y(), 'e', 6), locale.toString(realCameraPosition.z(), 'e', 6)));
+	painter.drawText(5, 32, QString("Plane distance: %1").arg(locale.toString(realPlaneDistance, 'e', 6)));
 }
 
 void RenderWidget::generateCubeVertices(std::array<QVector3D, 72>& cubeVertexData, std::array<QVector3D, 24>& cubeLinesVertexData, float width, float height, float depth)
@@ -364,16 +375,16 @@ void RenderWidget::updateLogic()
 		moveSpeedModifier *= 0.5f;
 
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_I))
-		mouseSpeedModifier *= 2.0f;
-
-	if (keyboardHelper.keyIsDownOnce(Qt::Key_K))
-		mouseSpeedModifier *= 0.5f;
-
-	if (keyboardHelper.keyIsDownOnce(Qt::Key_O))
 		mouseWheelSpeedModifier *= 2.0f;
 
-	if (keyboardHelper.keyIsDownOnce(Qt::Key_L))
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_K))
 		mouseWheelSpeedModifier *= 0.5f;
+
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_O))
+		mouseSpeedModifier *= 2.0f;
+
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_L))
+		mouseSpeedModifier *= 0.5f;
 
 	float moveSpeed = moveSpeedModifier;
 

@@ -185,6 +185,30 @@ void MainWindow::on_pushButtonLoadFullscreen_clicked()
 
 	connect(dialog, SIGNAL(rejected()), this, SLOT(fullscreenDialogClosed()));
 	connect(dialog, SIGNAL(accepted()), this, SLOT(fullscreenDialogClosed()));
+
+	QLocale locale(QLocale::English);
+
+	ImageLoaderInfo info;
+	info.fileName = ui.lineEditTiffImageFileName->text().toStdString();
+	info.channelCount = ui.spinBoxChannelCount->value();
+	info.imagesPerChannel = ui.spinBoxImagesPerChannel->value();
+	info.redChannelEnabled = ui.checkBoxRedChannelEnabled->isChecked();
+	info.greenChannelEnabled = ui.checkBoxGreenChannelEnabled->isChecked();
+	info.blueChannelEnabled = ui.checkBoxBlueChannelEnabled->isChecked();
+	info.redChannelIndex = ui.spinBoxRedChannel->value();
+	info.greenChannelIndex = ui.spinBoxGreenChannel->value();
+	info.blueChannelIndex = ui.spinBoxBlueChannel->value();
+
+	RenderWidgetSettings settings;
+	settings.imageLoaderInfo = info;
+	settings.backgroundColor = backgroundColor;
+	settings.lineColor = lineColor;
+	settings.imageWidth = locale.toFloat(ui.lineEditImageWidth->text());
+	settings.imageHeight = locale.toFloat(ui.lineEditImageHeight->text());
+	settings.imageDepth = locale.toFloat(ui.lineEditImageDepth->text());
+
+	renderWidget->initialize(settings);
+	renderWidget->setFocus();
 }
 
 void MainWindow::on_pushButtonPickBackgroundColor_clicked()
