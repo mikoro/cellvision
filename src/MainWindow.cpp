@@ -31,9 +31,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 	ui.lineEditMetadataFileName->setText(settings.value("metadataFileName", "").toString());
 	ui.spinBoxChannelCount->setValue(settings.value("channelCount", 1).toInt());
 	ui.spinBoxImagesPerChannel->setValue(settings.value("imagesPerChannel", 1).toInt());
-	ui.lineEditImageWidth->setText(locale.toString(settings.value("imageWidth", 1.0).toDouble()));
-	ui.lineEditImageHeight->setText(locale.toString(settings.value("imageHeight", 1.0).toDouble()));
-	ui.lineEditImageDepth->setText(locale.toString(settings.value("imageDepth", 1.0).toDouble()));
+	ui.lineEditImageWidth->setText(locale.toString(settings.value("imageWidth", 1.0).toDouble(), 'e', 6));
+	ui.lineEditImageHeight->setText(locale.toString(settings.value("imageHeight", 1.0).toDouble(), 'e', 6));
+	ui.lineEditImageDepth->setText(locale.toString(settings.value("imageDepth", 1.0).toDouble(), 'e', 6));
 	ui.spinBoxRedChannel->setValue(settings.value("redChannel", 1).toInt());
 	ui.spinBoxGreenChannel->setValue(settings.value("greenChannel", 1).toInt());
 	ui.spinBoxBlueChannel->setValue(settings.value("blueChannel", 1).toInt());
@@ -132,9 +132,9 @@ void MainWindow::on_pushButtonLoadFromMetadata_clicked()
 
 	ui.spinBoxChannelCount->setValue(result.channelCount);
 	ui.spinBoxImagesPerChannel->setValue(result.imagesPerChannel);
-	ui.lineEditImageWidth->setText(locale.toString(result.imageWidth));
-	ui.lineEditImageHeight->setText(locale.toString(result.imageHeight));
-	ui.lineEditImageDepth->setText(locale.toString(result.imageDepth));
+	ui.lineEditImageWidth->setText(locale.toString(result.imageWidth, 'e', 6));
+	ui.lineEditImageHeight->setText(locale.toString(result.imageHeight, 'e', 6));
+	ui.lineEditImageDepth->setText(locale.toString(result.imageDepth, 'e', 6));
 
 	this->setCursor(Qt::ArrowCursor);
 }
