@@ -157,7 +157,10 @@ void RenderWidget::wheelEvent(QWheelEvent* we)
 	if (keyboardHelper.keyIsDown(Qt::Key_Control))
 		moveSpeed *= 0.5f;
 
-	planeDistance += we->angleDelta().y() / 120.0f * moveSpeed;
+	float moveAmount = we->angleDelta().y() / 120.0f * moveSpeed;
+
+	cameraPosition += cameraForward * moveAmount;
+	planeDistance -= moveAmount;
 
 	we->accept();
 }
