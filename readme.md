@@ -30,24 +30,26 @@ data will be visualized with which color. Then clicking *Load windowed/fullscree
 
 ### Controls
 
-| Key                     | Action                                                                                |
-|-------------------------|---------------------------------------------------------------------------------------|
-| **WASD or arrows**      | Move camera around (+ Q/E for up/down)                                                |
-| **Mouse left**          | Rotate camera                                                                         |
-| **Mouse right**         | Orbit camera around a selected point                                                  |
-| **Mouse middle**        | Measure distances                                                                     |
-| **Mouse wheel**         | Move camera towards/away from the intersection plane                                  |
-| **Mouse left + right**  | Move camera forwards/backwards                                                        |
-| **Esc**                 | Close the fullscreen view or close the program when windowed                          |
-| **F**                   | Show/hide the bottom settings panel                                                   |
-| **R**                   | Reset the camera                                                                      |
-| **C**                   | Show/hide coordinates                                                                 |
-| **B**                   | Show/hide background                                                                  |
-| **Shift**               | Move faster                                                                           |
-| **Ctrl**                | Move slower                                                                           |
-| **U/J**                 | Increase/decrease move speed                                                          |
-| **I/K**                 | Increase/decrease mouse wheel step size                                               |
-| **O/L**                 | Increase/decrease mouse speed                                                         |
+| Key                      | Action                                                                                |
+|--------------------------|---------------------------------------------------------------------------------------|
+| **WASD or arrows**       | Move camera around (+ Q/E for up/down)                                                |
+| **Mouse left**           | Rotate camera around itself                                                           |
+| **Mouse right**          | Orbit camera around a selected point on the intersection plane                        |
+| **Mouse middle**         | Move camera forwards/backwards                                                        |
+| **Mouse middle + space** | Move camera sideways                                                                  |
+| **Mouse wheel**          | Move camera towards/away from the intersection plane                                  |
+| **Mouse left + right**   | Measure distances on the intersection plane                                           |
+| **Esc**                  | Close the fullscreen view or close the program when windowed                          |
+| **F**                    | Show/hide the bottom settings panel                                                   |
+| **R**                    | Reset the camera                                                                      |
+| **C**                    | Show/hide coordinates                                                                 |
+| **B**                    | Show/hide background                                                                  |
+| **T**                    | Show/hide text                                                                        |
+| **Shift**                | Move faster                                                                           |
+| **Ctrl**                 | Move slower                                                                           |
+| **U/J**                  | Increase/decrease move speed                                                          |
+| **I/K**                  | Increase/decrease mouse wheel step size                                               |
+| **O/L**                  | Increase/decrease mouse speed                                                         |
 
 ## Build
 
