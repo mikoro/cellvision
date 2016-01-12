@@ -61,6 +61,15 @@ void RenderWidget::initialize(const RenderWidgetSettings& settings_)
 bool RenderWidget::event(QEvent* e)
 {
 	keyboardHelper.event(e);
+
+	if (e->type() == QEvent::KeyPress || e->type() == QEvent::KeyRelease)
+	{
+		QKeyEvent* ke = static_cast<QKeyEvent*>(e);
+
+		if (ke->key() == Qt::Key_Space)
+			setMouseMode();
+	}
+
 	return QOpenGLWidget::event(e);
 }
 
@@ -68,16 +77,8 @@ void RenderWidget::mousePressEvent(QMouseEvent* me)
 {
 	setFocus();
 
-	if (me->buttons() == Qt::LeftButton)
-		mouseMode = MouseMode::ROTATE;
-	else if (me->buttons() == Qt::RightButton)
-		mouseMode = MouseMode::ORBIT;
-	else if (me->buttons() == (Qt::LeftButton | Qt::RightButton))
-		mouseMode = MouseMode::MOVE;
-	else if (me->buttons() == Qt::MidButton)
-		mouseMode = MouseMode::MEASURE;
-	else
-		mouseMode = MouseMode::NONE;
+	mouseButtons = me->buttons();
+	setMouseMode();
 
 	previousMousePosition = me->globalPos();
 
@@ -97,17 +98,8 @@ void RenderWidget::mousePressEvent(QMouseEvent* me)
 
 void RenderWidget::mouseReleaseEvent(QMouseEvent* me)
 {
-	if (me->buttons() == Qt::LeftButton)
-		mouseMode = MouseMode::ROTATE;
-	else if (me->buttons() == Qt::RightButton)
-		mouseMode = MouseMode::ORBIT;
-	else if (me->buttons() == (Qt::LeftButton | Qt::RightButton))
-		mouseMode = MouseMode::MOVE;
-	else if (me->buttons() == Qt::MidButton)
-		mouseMode = MouseMode::MEASURE;
-	else
-		mouseMode = MouseMode::NONE;
-
+	mouseButtons = me->buttons();
+	setMouseMode();
 	me->accept();
 }
 
@@ -115,6 +107,14 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 {
 	QPoint mouseDelta = me->globalPos() - previousMousePosition;
 	previousMousePosition = me->globalPos();
+
+	float moveSpeed = mouseSpeedModifier * 0.05f;
+
+	if (keyboardHelper.keyIsDown(Qt::Key_Shift))
+		moveSpeed *= 2.0f;
+
+	if (keyboardHelper.keyIsDown(Qt::Key_Control))
+		moveSpeed *= 0.5f;
 
 	if (mouseMode == MouseMode::ROTATE)
 	{
@@ -131,16 +131,12 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 
 		MathHelper::orthonormalize(cameraMatrix);
 	}
-	else if (mouseMode == MouseMode::MOVE)
+	else if (mouseMode == MouseMode::PAN)
 	{
-		float moveSpeed = mouseSpeedModifier * 0.05f;
-
-		if (keyboardHelper.keyIsDown(Qt::Key_Shift))
-			moveSpeed *= 2.0f;
-
-		if (keyboardHelper.keyIsDown(Qt::Key_Control))
-			moveSpeed *= 0.5f;
-
+		cameraPosition += cameraRight * mouseDelta.x() * moveSpeed + cameraUp * -mouseDelta.y() * moveSpeed;
+	}
+	else if (mouseMode == MouseMode::ZOOM)
+	{
 		cameraPosition += cameraForward * -mouseDelta.y() * moveSpeed;
 	}
 
@@ -588,4 +584,23 @@ void RenderWidget::resetCamera()
 	moveSpeedModifier = 1.0f;
 	mouseSpeedModifier = 0.25f;
 	mouseWheelSpeedModifier = 0.05f;
+}
+
+void RenderWidget::setMouseMode()
+{
+	if (mouseButtons == Qt::LeftButton)
+		mouseMode = MouseMode::ROTATE;
+	else if (mouseButtons == Qt::RightButton)
+		mouseMode = MouseMode::ORBIT;
+	else if (mouseButtons == Qt::MidButton)
+	{
+		if (keyboardHelper.keyIsDown(Qt::Key_Space))
+			mouseMode = MouseMode::PAN;
+		else
+			mouseMode = MouseMode::ZOOM;
+	}
+	else if (mouseButtons == (Qt::LeftButton | Qt::RightButton))
+		mouseMode = MouseMode::MEASURE;
+	else
+		mouseMode = MouseMode::NONE;
 }

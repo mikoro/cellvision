@@ -37,7 +37,7 @@ namespace CellVision
 		float imageDepth = 1.0f;
 	};
 
-	enum class MouseMode { NONE, ROTATE, ORBIT, MOVE, MEASURE };
+	enum class MouseMode { NONE, ROTATE, ORBIT, PAN, ZOOM, MEASURE };
 
 	class RenderWidget : public QOpenGLWidget, protected QOpenGLFunctions
 	{
@@ -69,10 +69,12 @@ namespace CellVision
 
 		void updateLogic();
 		void resetCamera();
+		void setMouseMode();
 
 		RenderWidgetSettings settings;
 
 		KeyboardHelper keyboardHelper;
+		Qt::MouseButtons mouseButtons;
 		QPoint previousMousePosition;
 		QElapsedTimer timeStepTimer;
 		QVector3D cameraPosition;
