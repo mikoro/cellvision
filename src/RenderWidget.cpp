@@ -374,24 +374,27 @@ void RenderWidget::paintGL()
 
 	// TEXTS //
 
-	QLocale locale(QLocale::English);
+	if (renderText)
+	{
+		QLocale locale(QLocale::English);
 
-	QVector3D realCameraPosition = cameraPosition * settings.imageWidth;
-	float realPlaneDistance = planeDistance * settings.imageWidth;
+		QVector3D realCameraPosition = cameraPosition * settings.imageWidth;
+		float realPlaneDistance = planeDistance * settings.imageWidth;
 
-	QFont font("mono", 10, QFont::Normal);
-	font.setHintingPreference(QFont::PreferFullHinting);
-	font.setStyleStrategy(QFont::PreferAntialias);
+		QFont font("mono", 10, QFont::Normal);
+		font.setHintingPreference(QFont::PreferFullHinting);
+		font.setStyleStrategy(QFont::PreferAntialias);
 
-	QPainter painter(this);
-	painter.setRenderHint(QPainter::Antialiasing);
-	painter.setRenderHint(QPainter::TextAntialiasing);
-	painter.setRenderHint(QPainter::SmoothPixmapTransform);
-	painter.setRenderHint(QPainter::HighQualityAntialiasing);
-	painter.setPen(Qt::white);
-	painter.setFont(QFont("mono", 10, QFont::Normal));
-	painter.drawText(5, 15, QString("Camera position: (%1, %2, %3)").arg(locale.toString(realCameraPosition.x(), 'e', 6), locale.toString(realCameraPosition.y(), 'e', 6), locale.toString(realCameraPosition.z(), 'e', 6)));
-	painter.drawText(5, 32, QString("Plane distance: %1").arg(locale.toString(realPlaneDistance, 'e', 6)));
+		QPainter painter(this);
+		painter.setRenderHint(QPainter::Antialiasing);
+		painter.setRenderHint(QPainter::TextAntialiasing);
+		painter.setRenderHint(QPainter::SmoothPixmapTransform);
+		painter.setRenderHint(QPainter::HighQualityAntialiasing);
+		painter.setPen(Qt::white);
+		painter.setFont(QFont("mono", 10, QFont::Normal));
+		painter.drawText(5, 15, QString("Camera position: (%1, %2, %3)").arg(locale.toString(realCameraPosition.x(), 'e', 6), locale.toString(realCameraPosition.y(), 'e', 6), locale.toString(realCameraPosition.z(), 'e', 6)));
+		painter.drawText(5, 32, QString("Plane distance: %1").arg(locale.toString(realPlaneDistance, 'e', 6)));
+	}
 }
 
 void RenderWidget::generateCubeVertices(std::array<QVector3D, 72>& cubeVertexData, std::array<QVector3D, 24>& cubeLinesVertexData, float width, float height, float depth)
@@ -521,6 +524,9 @@ void RenderWidget::updateLogic()
 
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_C))
 		renderCoordinates = !renderCoordinates;
+
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_T))
+		renderText = !renderText;
 
 	cameraRight = cameraMatrix.column(0).toVector3D();
 	cameraUp = cameraMatrix.column(1).toVector3D();

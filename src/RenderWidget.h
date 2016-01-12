@@ -90,6 +90,7 @@ namespace CellVision
 		float planeDistance = 1.0f;
 		bool renderBackground = true;
 		bool renderCoordinates = true;
+		bool renderText = true;
 
 		QOpenGLTexture volumeTexture;
 
