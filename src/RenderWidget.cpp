@@ -84,13 +84,18 @@ void RenderWidget::mousePressEvent(QMouseEvent* me)
 
 	if (mouseMode == MouseMode::ORBIT)
 	{
-		QPointF point = me->localPos();
-		float x = point.x() / float(width());
-		float y = point.y() / float(height());
-		x = (x - 0.5f) * 2.0f;
-		y = (y - 0.5f) * -2.0f;
+		float ndcX = me->localPos().x() / float(width());
+		float ndcY = me->localPos().y() / float(height());
+		ndcX = (ndcX - 0.5f) * 2.0f;
+		ndcY = (ndcY - 0.5f) * -2.0f;
 
-		tfm::printfln("x: %f y: %f", x, y);
+		QVector4D ndcPosition(ndcX, ndcY, 1.0f, 1.0f);
+		QMatrix4x4 tempMatrix = (projectionMatrix * viewMatrix).inverted();
+		QVector4D worldPosition = tempMatrix * ndcPosition;
+		QVector3D worldPosition3d(worldPosition.x() / worldPosition.w(), worldPosition.y() / worldPosition.w(), worldPosition.z() / worldPosition.w());
+		QVector3D rayDirection = (worldPosition3d - cameraPosition).normalized();
+
+		tfm::printfln("ndc: (%f, %f) ray: (%f, %f, %f)", ndcX, ndcY, rayDirection.x(), rayDirection.y(), rayDirection.z());
 	}
 
 	me->accept();
@@ -318,6 +323,9 @@ void RenderWidget::initializeGL()
 
 void RenderWidget::resizeGL(int width, int height)
 {
+	float aspectRatio = float(width) / float(height);
+	projectionMatrix.setToIdentity();
+	projectionMatrix.perspective(45.0f, aspectRatio, 0.001f, 100.0f);
 }
 
 void RenderWidget::paintGL()
@@ -592,13 +600,9 @@ void RenderWidget::updateLogic()
 	if (keyboardHelper.keyIsDown(Qt::Key_Q))
 		cameraPosition -= cameraUp * moveSpeed * timeStep;
 
-	QMatrix4x4 viewMatrix = cameraOrientationMatrix;
-	viewMatrix.setColumn(3, QVector4D(cameraPosition.x(), cameraPosition.y(), cameraPosition.z(), 1.0f));
-	viewMatrix = viewMatrix.inverted();
-
-	QMatrix4x4 projectionMatrix;
-	float aspectRatio = float(width()) / float(height());
-	projectionMatrix.perspective(45.0f, aspectRatio, 0.001f, 100.0f);
+	cameraMatrix = cameraOrientationMatrix;
+	cameraMatrix.setColumn(3, QVector4D(cameraPosition.x(), cameraPosition.y(), cameraPosition.z(), 1.0f));
+	viewMatrix = cameraMatrix.inverted();
 
 	cube.modelMatrix.setToIdentity();
 	cube.mvp = projectionMatrix * viewMatrix * cube.modelMatrix;
@@ -628,7 +632,6 @@ void RenderWidget::resetCamera()
 	float depth = settings.imageDepth / settings.imageWidth;
 
 	cameraPosition = QVector3D(0.5f, 0.5f, distance);
-	cameraRotation = QVector2D(0.0f, 0.0f);
 	cameraOrientationMatrix.setToIdentity();
 
 	planeDistance = distance - depth / 2.0f;

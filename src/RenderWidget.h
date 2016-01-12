@@ -78,8 +78,10 @@ namespace CellVision
 		QPoint previousMousePosition;
 		QElapsedTimer timeStepTimer;
 		QVector3D cameraPosition;
-		QVector2D cameraRotation;
 		QMatrix4x4 cameraOrientationMatrix;
+		QMatrix4x4 cameraMatrix;
+		QMatrix4x4 viewMatrix;
+		QMatrix4x4 projectionMatrix;
 		QVector3D cameraRight;
 		QVector3D cameraUp;
 		QVector3D cameraForward;
