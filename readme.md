@@ -43,6 +43,7 @@ data will be visualized with which color. Then clicking *Load windowed/fullscree
 | **F**                    | Show/hide the bottom settings panel                                                   |
 | **R**                    | Reset the camera                                                                      |
 | **C**                    | Show/hide coordinates                                                                 |
+| **V**                    | Show/hide mini coordinates                                                            |
 | **B**                    | Show/hide background                                                                  |
 | **T**                    | Show/hide text                                                                        |
 | **Shift**                | Move faster                                                                           |

@@ -259,6 +259,37 @@ void RenderWidget::initializeGL()
 	coordinates.vbo.release();
 	coordinates.program.release();
 
+	// MINI COORDINATES //
+
+	const float miniCoordinatesVertexData[] =
+	{
+		0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f
+	};
+
+	miniCoordinates.program.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/miniCoordinates.vert");
+	miniCoordinates.program.addShaderFromSourceFile(QOpenGLShader::Fragment, "data/shaders/miniCoordinates.frag");
+	miniCoordinates.program.link();
+	miniCoordinates.program.bind();
+
+	miniCoordinates.vbo.create();
+	miniCoordinates.vbo.bind();
+	miniCoordinates.vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
+	miniCoordinates.vbo.allocate(miniCoordinatesVertexData, sizeof(miniCoordinatesVertexData));
+
+	miniCoordinates.vao.create();
+	miniCoordinates.vao.bind();
+
+	miniCoordinates.program.enableAttributeArray("position");
+	miniCoordinates.program.enableAttributeArray("color");
+	miniCoordinates.program.setAttributeBuffer("position", GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
+	miniCoordinates.program.setAttributeBuffer("color", GL_FLOAT, 3 * sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
+
+	miniCoordinates.vao.release();
+	miniCoordinates.vbo.release();
+	miniCoordinates.program.release();
+
 	// BACKGROUND //
 
 	std::array<float, 30> backgroundVertexData;
@@ -371,6 +402,21 @@ void RenderWidget::paintGL()
 
 	plane.vao.release();
 	plane.program.release();
+
+	// MINI COORDINATES //
+
+	if (renderMiniCoordinates)
+	{
+		miniCoordinates.program.bind();
+		miniCoordinates.vao.bind();
+
+		miniCoordinates.program.setUniformValue("mvp", miniCoordinates.mvp);
+
+		glDrawArrays(GL_LINES, 0, 6);
+
+		miniCoordinates.vao.release();
+		miniCoordinates.program.release();
+	}
 
 	// TEXTS //
 
@@ -525,6 +571,9 @@ void RenderWidget::updateLogic()
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_C))
 		renderCoordinates = !renderCoordinates;
 
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_V))
+		renderMiniCoordinates = !renderMiniCoordinates;
+
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_T))
 		renderText = !renderText;
 
@@ -550,13 +599,11 @@ void RenderWidget::updateLogic()
 	if (keyboardHelper.keyIsDown(Qt::Key_Q))
 		cameraPosition -= cameraUp * moveSpeed * timeStep;
 
-	QMatrix4x4 tempCameraMatrix = cameraMatrix;
-	tempCameraMatrix.setColumn(3, QVector4D(cameraPosition.x(), cameraPosition.y(), cameraPosition.z(), 1.0f));
-
-	QMatrix4x4 viewMatrix = tempCameraMatrix.inverted();
+	QMatrix4x4 viewMatrix = cameraMatrix;
+	viewMatrix.setColumn(3, QVector4D(cameraPosition.x(), cameraPosition.y(), cameraPosition.z(), 1.0f));
+	viewMatrix = viewMatrix.inverted();
 
 	QMatrix4x4 projectionMatrix;
-	projectionMatrix.setToIdentity();
 	float aspectRatio = float(width()) / float(height());
 	projectionMatrix.perspective(45.0f, aspectRatio, 0.001f, 100.0f);
 
@@ -565,15 +612,21 @@ void RenderWidget::updateLogic()
 
 	QVector3D planePosition = cameraPosition + planeDistance * cameraForward;
 
-	plane.modelMatrix.setToIdentity();
-	plane.modelMatrix.setColumn(0, QVector4D(cameraRight.x(), cameraRight.y(), cameraRight.z(), 0.0f));
-	plane.modelMatrix.setColumn(1, QVector4D(cameraUp.x(), cameraUp.y(), cameraUp.z(), 0.0f));
-	plane.modelMatrix.setColumn(2, QVector4D(cameraForward.x(), cameraForward.y(), cameraForward.z(), 0.0f));
+	plane.modelMatrix = cameraMatrix;
 	plane.modelMatrix.setColumn(3, QVector4D(planePosition.x(), planePosition.y(), planePosition.z(), 1.0f));
 	plane.mvp = projectionMatrix * viewMatrix * plane.modelMatrix;
 
 	coordinates.modelMatrix.setToIdentity();
 	coordinates.mvp = projectionMatrix * viewMatrix * coordinates.modelMatrix;
+
+	QVector3D miniCoordPosition = cameraPosition + 1.0f * cameraForward;
+	QMatrix4x4 miniCoordTranslate;
+	miniCoordTranslate.translate(-5.0f * cameraRight - 5.0f * cameraUp);
+
+	miniCoordinates.modelMatrix = cameraMatrix;
+	miniCoordinates.modelMatrix.scale(0.1f);
+	miniCoordinates.modelMatrix.setColumn(3, QVector4D(miniCoordPosition.x(), miniCoordPosition.y(), miniCoordPosition.z(), 1.0f));
+	miniCoordinates.mvp = projectionMatrix * viewMatrix * miniCoordinates.modelMatrix * cameraMatrix;
 }
 
 void RenderWidget::resetCamera()

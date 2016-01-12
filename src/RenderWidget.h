@@ -90,6 +90,7 @@ namespace CellVision
 		float planeDistance = 1.0f;
 		bool renderBackground = true;
 		bool renderCoordinates = true;
+		bool renderMiniCoordinates = true;
 		bool renderText = true;
 
 		QOpenGLTexture volumeTexture;
@@ -97,6 +98,7 @@ namespace CellVision
 		OpenGLData cube;
 		OpenGLData plane;
 		OpenGLData coordinates;
+		OpenGLData miniCoordinates;
 		OpenGLData background;
 	};
 }
