@@ -12,5 +12,6 @@ namespace CellVision
 	public:
 
 		static void orthonormalize(QMatrix4x4& matrix);
+		static QMatrix4x4 rotationMatrix(float angle, const QVector3D& axis);
 	};
 }

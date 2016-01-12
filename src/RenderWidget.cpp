@@ -118,27 +118,20 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 
 	if (mouseMode == MouseMode::ROTATE)
 	{
-		QVector2D rotation = QVector2D(-mouseDelta.x(), -mouseDelta.y()) * mouseSpeedModifier;
+		float yawAmount = -mouseDelta.x() * mouseSpeedModifier;
+		float pitchAmount = -mouseDelta.y() * mouseSpeedModifier;
 
-		QVector3D cameraPitchAxis = cameraMatrix.column(0).toVector3D();
-		QVector3D cameraYawAxis = cameraMatrix.column(1).toVector3D();
-
-		QMatrix4x4 rotateMatrix;
-		rotateMatrix.rotate(rotation.y(), cameraPitchAxis);
-		rotateMatrix.rotate(rotation.x(), cameraYawAxis);
+		QMatrix4x4 yawMatrix = MathHelper::rotationMatrix(yawAmount, cameraUp);
+		QMatrix4x4 pitchMatrix = MathHelper::rotationMatrix(pitchAmount, cameraRight);
 		
-		cameraMatrix *= rotateMatrix;
+		cameraOrientationMatrix *= yawMatrix * pitchMatrix;
 
-		MathHelper::orthonormalize(cameraMatrix);
+		MathHelper::orthonormalize(cameraOrientationMatrix);
 	}
 	else if (mouseMode == MouseMode::PAN)
-	{
 		cameraPosition += cameraRight * mouseDelta.x() * moveSpeed + cameraUp * -mouseDelta.y() * moveSpeed;
-	}
 	else if (mouseMode == MouseMode::ZOOM)
-	{
 		cameraPosition += cameraForward * -mouseDelta.y() * moveSpeed;
-	}
 
 	me->accept();
 }
@@ -577,9 +570,9 @@ void RenderWidget::updateLogic()
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_T))
 		renderText = !renderText;
 
-	cameraRight = cameraMatrix.column(0).toVector3D();
-	cameraUp = cameraMatrix.column(1).toVector3D();
-	cameraForward = -cameraMatrix.column(2).toVector3D();
+	cameraRight = cameraOrientationMatrix.column(0).toVector3D();
+	cameraUp = cameraOrientationMatrix.column(1).toVector3D();
+	cameraForward = -cameraOrientationMatrix.column(2).toVector3D();
 
 	if (keyboardHelper.keyIsDown(Qt::Key_W) || keyboardHelper.keyIsDown(Qt::Key_Up))
 		cameraPosition += cameraForward * moveSpeed * timeStep;
@@ -599,7 +592,7 @@ void RenderWidget::updateLogic()
 	if (keyboardHelper.keyIsDown(Qt::Key_Q))
 		cameraPosition -= cameraUp * moveSpeed * timeStep;
 
-	QMatrix4x4 viewMatrix = cameraMatrix;
+	QMatrix4x4 viewMatrix = cameraOrientationMatrix;
 	viewMatrix.setColumn(3, QVector4D(cameraPosition.x(), cameraPosition.y(), cameraPosition.z(), 1.0f));
 	viewMatrix = viewMatrix.inverted();
 
@@ -612,7 +605,7 @@ void RenderWidget::updateLogic()
 
 	QVector3D planePosition = cameraPosition + planeDistance * cameraForward;
 
-	plane.modelMatrix = cameraMatrix;
+	plane.modelMatrix = cameraOrientationMatrix;
 	plane.modelMatrix.setColumn(3, QVector4D(planePosition.x(), planePosition.y(), planePosition.z(), 1.0f));
 	plane.mvp = projectionMatrix * viewMatrix * plane.modelMatrix;
 
@@ -623,10 +616,10 @@ void RenderWidget::updateLogic()
 	QMatrix4x4 miniCoordTranslate;
 	miniCoordTranslate.translate(-5.0f * cameraRight - 5.0f * cameraUp);
 
-	miniCoordinates.modelMatrix = cameraMatrix;
+	miniCoordinates.modelMatrix = cameraOrientationMatrix;
 	miniCoordinates.modelMatrix.scale(0.1f);
 	miniCoordinates.modelMatrix.setColumn(3, QVector4D(miniCoordPosition.x(), miniCoordPosition.y(), miniCoordPosition.z(), 1.0f));
-	miniCoordinates.mvp = projectionMatrix * viewMatrix * miniCoordinates.modelMatrix * cameraMatrix;
+	miniCoordinates.mvp = projectionMatrix * viewMatrix * miniCoordinates.modelMatrix * cameraOrientationMatrix;
 }
 
 void RenderWidget::resetCamera()
@@ -636,7 +629,7 @@ void RenderWidget::resetCamera()
 
 	cameraPosition = QVector3D(0.5f, 0.5f, distance);
 	cameraRotation = QVector2D(0.0f, 0.0f);
-	cameraMatrix.setToIdentity();
+	cameraOrientationMatrix.setToIdentity();
 
 	planeDistance = distance - depth / 2.0f;
 

@@ -79,7 +79,7 @@ namespace CellVision
 		QElapsedTimer timeStepTimer;
 		QVector3D cameraPosition;
 		QVector2D cameraRotation;
-		QMatrix4x4 cameraMatrix;
+		QMatrix4x4 cameraOrientationMatrix;
 		QVector3D cameraRight;
 		QVector3D cameraUp;
 		QVector3D cameraForward;
