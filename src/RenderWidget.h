@@ -64,14 +64,13 @@ namespace CellVision
 
 	private:
 
-		void generateCubeVertices(std::array<QVector3D, 72>& cubeVertexData, std::array<QVector3D, 24>& cubeLinesVertexData, float width, float height, float depth);
-		void generateBackgroundVertices(std::array<float, 30>& backgroundVertexData, QColor color);
-
 		void updateLogic();
 		void updateCamera();
 		void resetCamera();
 		void setMouseMode();
 		QVector3D getPlaneIntersection(const QPointF& mousePosition);
+		void generateCubeVertices(std::array<QVector3D, 72>& cubeVertexData, std::array<QVector3D, 24>& cubeLinesVertexData, float width, float height, float depth);
+		void generateBackgroundVertices(std::array<float, 30>& backgroundVertexData, QColor color);
 
 		RenderWidgetSettings settings;
 

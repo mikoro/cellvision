@@ -85,6 +85,8 @@ void RenderWidget::mousePressEvent(QMouseEvent* me)
 	if (mouseMode == MouseMode::ORBIT)
 	{
 		QVector3D intersectionPoint = getPlaneIntersection(me->localPos());
+
+		// TODO
 	}
 	else if (mouseMode == MouseMode::MEASURE)
 	{
@@ -116,6 +118,8 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 
 	if (mouseMode == MouseMode::ROTATE)
 	{
+		// TODO: FIX
+
 		float yawAmount = -mouseDelta.x() * mouseSpeedModifier;
 		float pitchAmount = -mouseDelta.y() * mouseSpeedModifier;
 
@@ -265,9 +269,9 @@ void RenderWidget::initializeGL()
 
 	const float miniCoordinatesVertexData[] =
 	{
-		0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f
+		0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f
 	};
 
 	miniCoordinates.program.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/miniCoordinates.vert");
@@ -285,8 +289,10 @@ void RenderWidget::initializeGL()
 
 	miniCoordinates.program.enableAttributeArray("position");
 	miniCoordinates.program.enableAttributeArray("color");
-	miniCoordinates.program.setAttributeBuffer("position", GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
-	miniCoordinates.program.setAttributeBuffer("color", GL_FLOAT, 3 * sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
+	miniCoordinates.program.enableAttributeArray("distance");
+	miniCoordinates.program.setAttributeBuffer("position", GL_FLOAT, 0, 3, 7 * sizeof(GLfloat));
+	miniCoordinates.program.setAttributeBuffer("color", GL_FLOAT, 3 * sizeof(GLfloat), 3, 7 * sizeof(GLfloat));
+	miniCoordinates.program.setAttributeBuffer("distance", GL_FLOAT, 6 * sizeof(GLfloat), 1, 7 * sizeof(GLfloat));
 
 	miniCoordinates.vao.release();
 	miniCoordinates.vbo.release();
@@ -440,6 +446,8 @@ void RenderWidget::paintGL()
 
 	if (renderMiniCoordinates)
 	{
+		glViewport(-50, -50, 200, 200);
+
 		miniCoordinates.program.bind();
 		miniCoordinates.vao.bind();
 
@@ -449,6 +457,8 @@ void RenderWidget::paintGL()
 
 		miniCoordinates.vao.release();
 		miniCoordinates.program.release();
+
+		glViewport(0, 0, width(), height());
 	}
 
 	// MEASUREMENT //
@@ -494,94 +504,6 @@ void RenderWidget::paintGL()
 		painter.drawText(5, 49, QString("Plane distance: %1").arg(locale.toString(realPlaneDistance, 'e', 3)));
 		painter.drawText(5, 66, QString("Measurement distance: %1").arg(locale.toString(realMeasurementDistance, 'e', 3)));
 	}
-}
-
-void RenderWidget::generateCubeVertices(std::array<QVector3D, 72>& cubeVertexData, std::array<QVector3D, 24>& cubeLinesVertexData, float width, float height, float depth)
-{
-	float actualWidth = 1.0f;
-	float actualHeight = height / width;
-	float actualDepth = depth / width;
-
-	QVector3D v1(0, 0, actualDepth); 
-	QVector3D v2(actualWidth, 0, actualDepth); 
-	QVector3D v3(0, actualHeight, actualDepth); 
-	QVector3D v4(actualWidth, actualHeight, actualDepth); 
-	QVector3D v5(0, 0, 0); 
-	QVector3D v6(actualWidth, 0, 0); 
-	QVector3D v7(0, actualHeight, 0); 
-	QVector3D v8(actualWidth, actualHeight, 0); 
-
-	QVector3D t1(0, 0, 1);
-	QVector3D t2(1, 0, 1);
-	QVector3D t3(0, 1, 1);
-	QVector3D t4(1, 1, 1);
-	QVector3D t5(0, 0, 0);
-	QVector3D t6(1, 0, 0);
-	QVector3D t7(0, 1, 0);
-	QVector3D t8(1, 1, 0);
-
-	std::array<QVector3D, 72> cubeVertexDataTemp =
-	{
-		v1, t1, v2, t2, v4, t4,
-		v1, t1, v4, t4, v3, t3,
-		v2, t2, v6, t6, v8, t8,
-		v2, t2, v8, t8, v4, t4,
-		v6, t6, v5, t5, v7, t7,
-		v6, t6, v7, t7, v8, t8,
-		v5, t5, v1, t1, v3, t3,
-		v5, t5, v3, t3, v7, t7,
-		v1, t1, v6, t6, v5, t5,
-		v1, t1, v2, t2, v6, t6,
-		v3, t3, v8, t8, v7, t7,
-		v3, t3, v4, t4, v8, t8
-	};
-
-	cubeVertexData = cubeVertexDataTemp;
-
-	std::array<QVector3D, 24> cubeLinesVertexDataTemp =
-	{
-		v1, v2,
-		v2, v4,
-		v4, v3,
-		v3, v1,
-		v2, v6,
-		v6, v5,
-		v5, v1,
-		v6, v8,
-		v8, v7,
-		v7, v5,
-		v4, v8,
-		v3, v7,
-	};
-
-	cubeLinesVertexData = cubeLinesVertexDataTemp;
-}
-
-void RenderWidget::generateBackgroundVertices(std::array<float, 30>& backgroundVertexData, QColor color)
-{
-	float alpha1 = 0.6f;
-	float alpha2 = 1.4f;
-
-	float red1 = std::max(0.0f, std::min(1.0f, float(alpha1 * color.redF())));
-	float green1 = std::max(0.0f, std::min(1.0f, float(alpha1 * color.greenF())));
-	float blue1 = std::max(0.0f, std::min(1.0f, float(alpha1 * color.blueF())));
-
-	float red2 = std::max(0.0f, std::min(1.0f, float(alpha2 * color.redF())));
-	float green2 = std::max(0.0f, std::min(1.0f, float(alpha2 * color.greenF())));
-	float blue2 = std::max(0.0f, std::min(1.0f, float(alpha2 * color.blueF())));
-
-	std::array<float, 30> backgroundVertexDataTemp =
-	{
-		-1.0f, -1.0f, red1, green1, blue1,
-		1.0f, -1.0f, red1, green1, blue1,
-		1.0f, 1.0f, red2, green2, blue2,
-
-		-1.0f, -1.0f, red1, green1, blue1,
-		1.0f, 1.0f, red2, green2, blue2,
-		-1.0f, 1.0f, red2, green2, blue2,
-	};
-
-	backgroundVertexData = backgroundVertexDataTemp;
 }
 
 void RenderWidget::updateLogic()
@@ -672,11 +594,13 @@ void RenderWidget::updateLogic()
 	// MINI COORDINATES //
 
 	QVector3D miniCoordPosition = cameraPosition + 1.0f * cameraForward;
+	QMatrix4x4 miniCoordProjection;
+	miniCoordProjection.perspective(45.0f, 1.0f, 0.1f, 10.0f);
 	
 	miniCoordinates.modelMatrix.setToIdentity();
-	miniCoordinates.modelMatrix.scale(0.1f);
+	miniCoordinates.modelMatrix.scale(0.2f);
 	miniCoordinates.modelMatrix.setColumn(3, QVector4D(miniCoordPosition.x(), miniCoordPosition.y(), miniCoordPosition.z(), 1.0f));
-	miniCoordinates.mvp = projectionMatrix * viewMatrix * miniCoordinates.modelMatrix;
+	miniCoordinates.mvp = miniCoordProjection * viewMatrix * miniCoordinates.modelMatrix;
 
 	// MEASUREMENT //
 
@@ -760,4 +684,92 @@ QVector3D RenderWidget::getPlaneIntersection(const QPointF& mousePosition)
 		return QVector3D();;
 
 	return cameraPosition + (t * rayDirection);
+}
+
+void RenderWidget::generateCubeVertices(std::array<QVector3D, 72>& cubeVertexData, std::array<QVector3D, 24>& cubeLinesVertexData, float width, float height, float depth)
+{
+	float actualWidth = 1.0f;
+	float actualHeight = height / width;
+	float actualDepth = depth / width;
+
+	QVector3D v1(0, 0, actualDepth);
+	QVector3D v2(actualWidth, 0, actualDepth);
+	QVector3D v3(0, actualHeight, actualDepth);
+	QVector3D v4(actualWidth, actualHeight, actualDepth);
+	QVector3D v5(0, 0, 0);
+	QVector3D v6(actualWidth, 0, 0);
+	QVector3D v7(0, actualHeight, 0);
+	QVector3D v8(actualWidth, actualHeight, 0);
+
+	QVector3D t1(0, 0, 1);
+	QVector3D t2(1, 0, 1);
+	QVector3D t3(0, 1, 1);
+	QVector3D t4(1, 1, 1);
+	QVector3D t5(0, 0, 0);
+	QVector3D t6(1, 0, 0);
+	QVector3D t7(0, 1, 0);
+	QVector3D t8(1, 1, 0);
+
+	std::array<QVector3D, 72> cubeVertexDataTemp =
+	{
+		v1, t1, v2, t2, v4, t4,
+		v1, t1, v4, t4, v3, t3,
+		v2, t2, v6, t6, v8, t8,
+		v2, t2, v8, t8, v4, t4,
+		v6, t6, v5, t5, v7, t7,
+		v6, t6, v7, t7, v8, t8,
+		v5, t5, v1, t1, v3, t3,
+		v5, t5, v3, t3, v7, t7,
+		v1, t1, v6, t6, v5, t5,
+		v1, t1, v2, t2, v6, t6,
+		v3, t3, v8, t8, v7, t7,
+		v3, t3, v4, t4, v8, t8
+	};
+
+	cubeVertexData = cubeVertexDataTemp;
+
+	std::array<QVector3D, 24> cubeLinesVertexDataTemp =
+	{
+		v1, v2,
+		v2, v4,
+		v4, v3,
+		v3, v1,
+		v2, v6,
+		v6, v5,
+		v5, v1,
+		v6, v8,
+		v8, v7,
+		v7, v5,
+		v4, v8,
+		v3, v7,
+	};
+
+	cubeLinesVertexData = cubeLinesVertexDataTemp;
+}
+
+void RenderWidget::generateBackgroundVertices(std::array<float, 30>& backgroundVertexData, QColor color)
+{
+	float alpha1 = 0.6f;
+	float alpha2 = 1.4f;
+
+	float red1 = std::max(0.0f, std::min(1.0f, float(alpha1 * color.redF())));
+	float green1 = std::max(0.0f, std::min(1.0f, float(alpha1 * color.greenF())));
+	float blue1 = std::max(0.0f, std::min(1.0f, float(alpha1 * color.blueF())));
+
+	float red2 = std::max(0.0f, std::min(1.0f, float(alpha2 * color.redF())));
+	float green2 = std::max(0.0f, std::min(1.0f, float(alpha2 * color.greenF())));
+	float blue2 = std::max(0.0f, std::min(1.0f, float(alpha2 * color.blueF())));
+
+	std::array<float, 30> backgroundVertexDataTemp =
+	{
+		-1.0f, -1.0f, red1, green1, blue1,
+		1.0f, -1.0f, red1, green1, blue1,
+		1.0f, 1.0f, red2, green2, blue2,
+
+		-1.0f, -1.0f, red1, green1, blue1,
+		1.0f, 1.0f, red2, green2, blue2,
+		-1.0f, 1.0f, red2, green2, blue2,
+	};
+
+	backgroundVertexData = backgroundVertexDataTemp;
 }
