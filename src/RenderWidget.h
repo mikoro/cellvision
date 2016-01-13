@@ -68,8 +68,11 @@ namespace CellVision
 		void generateBackgroundVertices(std::array<float, 30>& backgroundVertexData, QColor color);
 
 		void updateLogic();
+		void updateCamera();
 		void resetCamera();
 		void setMouseMode();
+		QVector3D getRay(float ndcX, float ndcY);
+		QVector3D getRayPlaneIntersection(const QVector3D& ray);
 
 		RenderWidgetSettings settings;
 
@@ -79,12 +82,15 @@ namespace CellVision
 		QElapsedTimer timeStepTimer;
 		QVector3D cameraPosition;
 		QMatrix4x4 cameraOrientationMatrix;
+		QMatrix4x4 cameraOrientationInvMatrix;
 		QMatrix4x4 cameraMatrix;
 		QMatrix4x4 viewMatrix;
 		QMatrix4x4 projectionMatrix;
 		QVector3D cameraRight;
 		QVector3D cameraUp;
 		QVector3D cameraForward;
+		QVector3D planePosition;
+		QVector3D planeNormal;
 		MouseMode mouseMode = MouseMode::NONE;
 		float moveSpeedModifier = 1.0f;
 		float mouseSpeedModifier = 0.25f;
