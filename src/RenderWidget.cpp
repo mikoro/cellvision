@@ -81,18 +81,14 @@ void RenderWidget::mousePressEvent(QMouseEvent* me)
 	setMouseMode();
 
 	previousMousePosition = me->globalPos();
-
+	
 	if (mouseMode == MouseMode::ORBIT)
 	{
-		float ndcX = me->localPos().x() / float(width());
-		float ndcY = me->localPos().y() / float(height());
-		ndcX = (ndcX - 0.5f) * 2.0f;
-		ndcY = (ndcY - 0.5f) * -2.0f;
-
-		QVector3D ray = getRay(ndcX, ndcY);
-		QVector3D intersection = getRayPlaneIntersection(ray);
-
-		tfm::printfln("ndc: (%f, %f) intersection: (%f, %f, %f)", ndcX, ndcY, intersection.x(), intersection.y(), intersection.z());
+		QVector3D intersectionPoint = getPlaneIntersection(me->localPos());
+	}
+	else if (mouseMode == MouseMode::MEASURE)
+	{
+		measureStartPoint = measureEndPoint = getPlaneIntersection(me->localPos());
 	}
 
 	me->accept();
@@ -133,10 +129,18 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 		MathHelper::orthonormalize(cameraOrientationMatrix);
 		cameraOrientationInvMatrix = cameraOrientationMatrix.inverted();
 	}
+	else if (mouseMode == MouseMode::ORBIT)
+	{
+	}
 	else if (mouseMode == MouseMode::PAN)
-		cameraPosition += cameraRight * mouseDelta.x() * moveSpeed + cameraUp * -mouseDelta.y() * moveSpeed;
+		cameraPosition += cameraRight * -mouseDelta.x() * moveSpeed + cameraUp * mouseDelta.y() * moveSpeed;
 	else if (mouseMode == MouseMode::ZOOM)
 		cameraPosition += cameraForward * -mouseDelta.y() * moveSpeed;
+	else if (mouseMode == MouseMode::MEASURE)
+	{
+		measureEndPoint = getPlaneIntersection(me->localPos());
+		measureDistance = (measureEndPoint - measureStartPoint).length();
+	}
 
 	me->accept();
 }
@@ -315,6 +319,33 @@ void RenderWidget::initializeGL()
 	background.vbo.release();
 	background.program.release();
 
+	// MEASUREMENT //
+
+	const float measurementVertexData[] =
+	{
+		0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
+	};
+
+	measurement.program.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/measurement.vert");
+	measurement.program.addShaderFromSourceFile(QOpenGLShader::Fragment, "data/shaders/measurement.frag");
+	measurement.program.link();
+	measurement.program.bind();
+
+	measurement.vbo.create();
+	measurement.vbo.bind();
+	measurement.vbo.setUsagePattern(QOpenGLBuffer::DynamicDraw);
+	measurement.vbo.allocate(measurementVertexData, sizeof(measurementVertexData));
+
+	measurement.vao.create();
+	measurement.vao.bind();
+
+	measurement.program.enableAttributeArray("position");
+	measurement.program.setAttributeBuffer("position", GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
+
+	measurement.vao.release();
+	measurement.vbo.release();
+	measurement.program.release();
+
 	// MISC //
 
 	timeStepTimer.start();
@@ -420,6 +451,22 @@ void RenderWidget::paintGL()
 		miniCoordinates.program.release();
 	}
 
+	// MEASUREMENT //
+
+	if (mouseMode == MouseMode::MEASURE)
+	{
+		measurement.program.bind();
+		measurement.vao.bind();
+
+		measurement.program.setUniformValue("lineColor", settings.lineColor);
+		measurement.program.setUniformValue("mvp", measurement.mvp);
+
+		glDrawArrays(GL_LINES, 0, 2);
+
+		measurement.vao.release();
+		measurement.program.release();
+	}
+
 	// TEXTS //
 
 	if (renderText)
@@ -427,7 +474,9 @@ void RenderWidget::paintGL()
 		QLocale locale(QLocale::English);
 
 		QVector3D realCameraPosition = cameraPosition * settings.imageWidth;
+		QVector3D realPlanePosition = planePosition * settings.imageWidth;
 		float realPlaneDistance = planeDistance * settings.imageWidth;
+		float realMeasurementDistance = measureDistance * settings.imageWidth;
 
 		QFont font("mono", 10, QFont::Normal);
 		font.setHintingPreference(QFont::PreferFullHinting);
@@ -440,8 +489,10 @@ void RenderWidget::paintGL()
 		painter.setRenderHint(QPainter::HighQualityAntialiasing);
 		painter.setPen(Qt::white);
 		painter.setFont(QFont("mono", 10, QFont::Normal));
-		painter.drawText(5, 15, QString("Camera position: (%1, %2, %3)").arg(locale.toString(realCameraPosition.x(), 'e', 6), locale.toString(realCameraPosition.y(), 'e', 6), locale.toString(realCameraPosition.z(), 'e', 6)));
-		painter.drawText(5, 32, QString("Plane distance: %1").arg(locale.toString(realPlaneDistance, 'e', 6)));
+		painter.drawText(5, 15, QString("Camera position: (%1, %2, %3)").arg(locale.toString(realCameraPosition.x(), 'e', 3), locale.toString(realCameraPosition.y(), 'e', 3), locale.toString(realCameraPosition.z(), 'e', 3)));
+		painter.drawText(5, 32, QString("Plane position: (%1, %2, %3)").arg(locale.toString(realPlanePosition.x(), 'e', 3), locale.toString(realPlanePosition.y(), 'e', 3), locale.toString(realPlanePosition.z(), 'e', 3)));
+		painter.drawText(5, 49, QString("Plane distance: %1").arg(locale.toString(realPlaneDistance, 'e', 3)));
+		painter.drawText(5, 66, QString("Measurement distance: %1").arg(locale.toString(realMeasurementDistance, 'e', 3)));
 	}
 }
 
@@ -626,6 +677,17 @@ void RenderWidget::updateLogic()
 	miniCoordinates.modelMatrix.scale(0.1f);
 	miniCoordinates.modelMatrix.setColumn(3, QVector4D(miniCoordPosition.x(), miniCoordPosition.y(), miniCoordPosition.z(), 1.0f));
 	miniCoordinates.mvp = projectionMatrix * viewMatrix * miniCoordinates.modelMatrix;
+
+	// MEASUREMENT //
+
+	measurement.modelMatrix.setToIdentity();
+	measurement.mvp = projectionMatrix * viewMatrix * measurement.modelMatrix;
+
+	const QVector3D measurementVertexData[] = { measureStartPoint, measureEndPoint };
+
+	measurement.vbo.bind();
+	measurement.vbo.write(0, measurementVertexData, sizeof(measurementVertexData));
+	measurement.vbo.release();
 }
 
 void RenderWidget::updateCamera()
@@ -674,20 +736,20 @@ void RenderWidget::setMouseMode()
 		mouseMode = MouseMode::NONE;
 }
 
-QVector3D RenderWidget::getRay(float ndcX, float ndcY)
+QVector3D RenderWidget::getPlaneIntersection(const QPointF& mousePosition)
 {
+	float ndcX = mousePosition.x() / float(width());
+	float ndcY = mousePosition.y() / float(height());
+	ndcX = (ndcX - 0.5f) * 2.0f;
+	ndcY = (ndcY - 0.5f) * -2.0f;
+
 	QVector4D ndcPosition(ndcX, ndcY, 1.0f, 1.0f);
 	QMatrix4x4 tempMatrix = (projectionMatrix * viewMatrix).inverted();
 	QVector4D worldPosition = tempMatrix * ndcPosition;
 	QVector3D worldPosition3d(worldPosition.x() / worldPosition.w(), worldPosition.y() / worldPosition.w(), worldPosition.z() / worldPosition.w());
 	QVector3D rayDirection = (worldPosition3d - cameraPosition).normalized();
 
-	return rayDirection;
-}
-
-QVector3D RenderWidget::getRayPlaneIntersection(const QVector3D& ray)
-{
-	float denominator = QVector3D::dotProduct(ray, planeNormal);
+	float denominator = QVector3D::dotProduct(rayDirection, planeNormal);
 
 	if (std::abs(denominator) < std::numeric_limits<double>::epsilon())
 		return QVector3D();
@@ -697,5 +759,5 @@ QVector3D RenderWidget::getRayPlaneIntersection(const QVector3D& ray)
 	if (t < 0.0)
 		return QVector3D();;
 
-	return cameraPosition + (t * ray);
+	return cameraPosition + (t * rayDirection);
 }

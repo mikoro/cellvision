@@ -71,8 +71,7 @@ namespace CellVision
 		void updateCamera();
 		void resetCamera();
 		void setMouseMode();
-		QVector3D getRay(float ndcX, float ndcY);
-		QVector3D getRayPlaneIntersection(const QVector3D& ray);
+		QVector3D getPlaneIntersection(const QPointF& mousePosition);
 
 		RenderWidgetSettings settings;
 
@@ -91,11 +90,14 @@ namespace CellVision
 		QVector3D cameraForward;
 		QVector3D planePosition;
 		QVector3D planeNormal;
+		QVector3D measureStartPoint;
+		QVector3D measureEndPoint;
 		MouseMode mouseMode = MouseMode::NONE;
 		float moveSpeedModifier = 1.0f;
 		float mouseSpeedModifier = 0.25f;
 		float mouseWheelSpeedModifier = 0.05f;
 		float planeDistance = 1.0f;
+		float measureDistance = 0.0f;
 		bool renderBackground = true;
 		bool renderCoordinates = true;
 		bool renderMiniCoordinates = true;
@@ -108,5 +110,6 @@ namespace CellVision
 		OpenGLData coordinates;
 		OpenGLData miniCoordinates;
 		OpenGLData background;
+		OpenGLData measurement;
 	};
 }
