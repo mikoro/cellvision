@@ -34,7 +34,7 @@ data will be visualized with which color. Then clicking *Load windowed/fullscree
 |--------------------------|---------------------------------------------------------------------------------------|
 | **WASD or arrows**       | Move camera around (+ Q/E for up/down)                                                |
 | **Mouse left**           | Rotate camera around itself                                                           |
-| **Mouse left + space **  | Roll camera around itself                                                             |
+| **Mouse left + space**   | Roll camera around itself                                                             |
 | **Mouse right**          | Orbit camera around a selected point on the intersection plane                        |
 | **Mouse middle**         | Move camera along the intersection plane                                              |
 | **Mouse middle + space** | Move camera and intersection plane forwards/backwards                                 |
