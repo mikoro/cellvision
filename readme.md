@@ -36,22 +36,24 @@ data will be visualized with which color. Then clicking *Load windowed/fullscree
 | **Mouse left**           | Rotate camera around itself                                                           |
 | **Mouse left + space **  | Roll camera around itself                                                             |
 | **Mouse right**          | Orbit camera around a selected point on the intersection plane                        |
-| **Mouse middle**         | Move camera forwards/backwards                                                        |
-| **Mouse middle + space** | Move camera sideways                                                                  |
+| **Mouse middle**         | Move camera along the intersection plane                                              |
+| **Mouse middle + space** | Move camera and intersection plane forwards/backwards                                 |
 | **Mouse wheel**          | Move camera towards/away from the intersection plane                                  |
 | **Mouse left + right**   | Measure distances on the intersection plane                                           |
 | **Esc**                  | Close the fullscreen view or close the program when windowed                          |
 | **F**                    | Show/hide the bottom settings panel                                                   |
-| **R**                    | Reset the camera                                                                      |
+| **R**                    | Reset the camera position and orientation                                             |
+| **Ctrl + R**             | Reset all the move/rotate speeds                                                      |
 | **C**                    | Show/hide coordinates                                                                 |
 | **V**                    | Show/hide mini coordinates                                                            |
 | **B**                    | Show/hide background                                                                  |
 | **T**                    | Show/hide text                                                                        |
-| **Shift**                | Move faster                                                                           |
-| **Ctrl**                 | Move slower                                                                           |
-| **U/J**                  | Increase/decrease move speed                                                          |
-| **I/K**                  | Increase/decrease mouse wheel step size                                               |
-| **O/L**                  | Increase/decrease mouse speed                                                         |
+| **Shift**                | Move faster/more                                                                      |
+| **Ctrl**                 | Move slower/less                                                                      |
+| **Y/H**                  | Increase/decrease move speed                                                          |
+| **U/J**                  | Increase/decrease mouse move speed                                                    |
+| **I/K**                  | Increase/decrease mouse rotate speed                                                  |
+| **O/L**                  | Increase/decrease mouse wheel step size                                               |
 
 ## Build
 

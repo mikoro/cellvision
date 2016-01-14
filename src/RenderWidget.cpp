@@ -55,7 +55,8 @@ void RenderWidget::initialize(const RenderWidgetSettings& settings_)
 	background.vbo.write(0, backgroundVertexData.data(), sizeof(backgroundVertexData));
 	background.vbo.release();
 
-	resetCamera();
+	resetCameraPosition();
+	resetCameraSpeeds();
 }
 
 bool RenderWidget::event(QEvent* e)
@@ -102,10 +103,10 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 	QPoint mouseDelta = me->globalPos() - previousMousePosition;
 	previousMousePosition = me->globalPos();
 
-	float moveSpeed = mouseSpeedModifier * 0.05f;
-	float yawAmount = -mouseDelta.x() * mouseSpeedModifier;
-	float pitchAmount = -mouseDelta.y() * mouseSpeedModifier;
-
+	float yawAmount = -mouseDelta.x() * mouseRotateSpeedModifier;
+	float pitchAmount = -mouseDelta.y() * mouseRotateSpeedModifier;
+	float moveSpeed = mouseMoveSpeedModifier;
+	
 	if (keyboardHelper.keyIsDown(Qt::Key_Shift))
 		moveSpeed *= 2.0f;
 
@@ -116,19 +117,16 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 	{
 		if (keyboardHelper.keyIsDown(Qt::Key_Space))
 		{
-			//QVector3D rollAxis = cameraOrientationMatrix.column(2).toVector3D();
 			QVector3D rollAxis = QVector3D(0, 0, 1);
 			QMatrix4x4 rollMatrix = MathHelper::rotationMatrix(yawAmount, rollAxis);
 			cameraOrientationMatrix = cameraOrientationMatrix * rollMatrix;
 		}
 		else
 		{
-			//QVector3D yawAxis = cameraOrientationMatrix.column(1).toVector3D();
 			QVector3D yawAxis = QVector3D(0, 1, 0);
 			QMatrix4x4 yawMatrix = MathHelper::rotationMatrix(yawAmount, yawAxis);
 			cameraOrientationMatrix = cameraOrientationMatrix * yawMatrix;
 
-			//QVector3D pitchAxis = cameraOrientationMatrix.column(0).toVector3D();
 			QVector3D pitchAxis = QVector3D(1, 0, 0);
 			QMatrix4x4 pitchMatrix = MathHelper::rotationMatrix(pitchAmount, pitchAxis);
 			cameraOrientationMatrix = cameraOrientationMatrix * pitchMatrix;
@@ -169,15 +167,15 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 
 void RenderWidget::wheelEvent(QWheelEvent* we)
 {
-	float moveSpeed = mouseWheelSpeedModifier;
+	float stepSize = mouseWheelStepSizeModifier;
 
 	if (keyboardHelper.keyIsDown(Qt::Key_Shift))
-		moveSpeed *= 2.0f;
+		stepSize *= 2.0f;
 
 	if (keyboardHelper.keyIsDown(Qt::Key_Control))
-		moveSpeed *= 0.5f;
+		stepSize *= 0.5f;
 
-	float moveAmount = we->angleDelta().y() / 120.0f * moveSpeed;
+	float moveAmount = we->angleDelta().y() / 120.0f * stepSize;
 
 	cameraPosition += cameraForward * moveAmount;
 	planeDistance -= moveAmount;
@@ -373,7 +371,8 @@ void RenderWidget::initializeGL()
 	// MISC //
 
 	timeStepTimer.start();
-	resetCamera();
+	resetCameraPosition();
+	resetCameraSpeeds();
 	updateCamera();
 }
 
@@ -529,23 +528,29 @@ void RenderWidget::updateLogic()
 	float timeStep = timeStepTimer.nsecsElapsed() / 1000000000.0f;
 	timeStepTimer.restart();
 
-	if (keyboardHelper.keyIsDownOnce(Qt::Key_U))
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_Y))
 		moveSpeedModifier *= 2.0f;
 
-	if (keyboardHelper.keyIsDownOnce(Qt::Key_J))
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_H))
 		moveSpeedModifier *= 0.5f;
 
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_U))
+		mouseMoveSpeedModifier *= 2.0f;
+
+	if (keyboardHelper.keyIsDownOnce(Qt::Key_J))
+		mouseMoveSpeedModifier *= 0.5f;
+
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_I))
-		mouseWheelSpeedModifier *= 2.0f;
+		mouseRotateSpeedModifier *= 2.0f;
 
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_K))
-		mouseWheelSpeedModifier *= 0.5f;
+		mouseRotateSpeedModifier *= 0.5f;
 
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_O))
-		mouseSpeedModifier *= 2.0f;
+		mouseWheelStepSizeModifier *= 2.0f;
 
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_L))
-		mouseSpeedModifier *= 0.5f;
+		mouseWheelStepSizeModifier *= 0.5f;
 
 	float moveSpeed = moveSpeedModifier;
 
@@ -556,7 +561,12 @@ void RenderWidget::updateLogic()
 		moveSpeed *= 0.5f;
 
 	if (keyboardHelper.keyIsDown(Qt::Key_R))
-		resetCamera();
+	{
+		if (keyboardHelper.keyIsDown(Qt::Key_Control))
+			resetCameraSpeeds();
+		else
+			resetCameraPosition();
+	}
 
 	if (keyboardHelper.keyIsDownOnce(Qt::Key_B))
 		renderBackground = !renderBackground;
@@ -643,7 +653,7 @@ void RenderWidget::updateCamera()
 	cameraForward = -cameraOrientationMatrix.column(2).toVector3D();
 }
 
-void RenderWidget::resetCamera()
+void RenderWidget::resetCameraPosition()
 {
 	float distance = 2.3f;
 	float depth = settings.imageDepth / settings.imageWidth;
@@ -651,12 +661,15 @@ void RenderWidget::resetCamera()
 	cameraPosition = QVector3D(0.5f, 0.5f, distance);
 	cameraOrientationMatrix.setToIdentity();
 	cameraOrientationInvMatrix.setToIdentity();
-
 	planeDistance = distance - depth / 2.0f;
+}
 
-	moveSpeedModifier = 1.0f;
-	mouseSpeedModifier = 0.25f;
-	mouseWheelSpeedModifier = 0.05f;
+void RenderWidget::resetCameraSpeeds()
+{
+	moveSpeedModifier = 0.8f;
+	mouseMoveSpeedModifier = 0.001f;
+	mouseRotateSpeedModifier = 0.2f;
+	mouseWheelStepSizeModifier = 0.05f;
 }
 
 void RenderWidget::setMouseMode()
@@ -668,9 +681,9 @@ void RenderWidget::setMouseMode()
 	else if (mouseButtons == Qt::MidButton)
 	{
 		if (keyboardHelper.keyIsDown(Qt::Key_Space))
-			mouseMode = MouseMode::PAN;
-		else
 			mouseMode = MouseMode::ZOOM;
+		else
+			mouseMode = MouseMode::PAN;
 	}
 	else if (mouseButtons == (Qt::LeftButton | Qt::RightButton))
 		mouseMode = MouseMode::MEASURE;

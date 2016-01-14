@@ -66,7 +66,8 @@ namespace CellVision
 
 		void updateLogic();
 		void updateCamera();
-		void resetCamera();
+		void resetCameraPosition();
+		void resetCameraSpeeds();
 		void setMouseMode();
 		QVector3D getPlaneIntersection(const QPointF& mousePosition);
 		void generateCubeVertices(std::array<QVector3D, 72>& cubeVertexData, std::array<QVector3D, 24>& cubeLinesVertexData, float width, float height, float depth);
@@ -94,9 +95,10 @@ namespace CellVision
 		QVector3D orbitPointWorld;
 		QVector3D orbitPointCamera;
 		MouseMode mouseMode = MouseMode::NONE;
-		float moveSpeedModifier = 1.0f;
-		float mouseSpeedModifier = 0.25f;
-		float mouseWheelSpeedModifier = 0.05f;
+		float moveSpeedModifier = 0.0f;
+		float mouseMoveSpeedModifier = 0.0f;
+		float mouseRotateSpeedModifier = 0.0f;
+		float mouseWheelStepSizeModifier = 0.0f;
 		float planeDistance = 1.0f;
 		float measureDistance = 0.0f;
 		bool renderBackground = true;
