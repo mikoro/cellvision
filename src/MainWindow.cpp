@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 	ui.lineEditImageHeight->setValidator(&doubleValueValidator);
 	ui.lineEditImageDepth->setValidator(&doubleValueValidator);
 
-	QSettings settings;
+	QSettings settings("cellvision.ini", QSettings::IniFormat);
 
 	resize(settings.value("windowSize", QSize(1280, 1000)).toSize());
 	ui.splitterMain->setSizes({ 1000, 1 });
@@ -76,7 +76,7 @@ void MainWindow::keyPressEvent(QKeyEvent* ke)
 
 void MainWindow::closeEvent(QCloseEvent* ce)
 {
-	QSettings settings;
+	QSettings settings("cellvision.ini", QSettings::IniFormat);
 
 	settings.setValue("windowSize", this->size());
 	settings.setValue("tiffImageFileName", ui.lineEditTiffImageFileName->text());
