@@ -91,6 +91,8 @@ namespace CellVision
 		QVector3D planeNormal;
 		QVector3D measureStartPoint;
 		QVector3D measureEndPoint;
+		QVector3D orbitPointWorld;
+		QVector3D orbitPointCamera;
 		MouseMode mouseMode = MouseMode::NONE;
 		float moveSpeedModifier = 1.0f;
 		float mouseSpeedModifier = 0.25f;

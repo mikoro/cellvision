@@ -83,15 +83,9 @@ void RenderWidget::mousePressEvent(QMouseEvent* me)
 	previousMousePosition = me->globalPos();
 	
 	if (mouseMode == MouseMode::ORBIT)
-	{
-		QVector3D intersectionPoint = getPlaneIntersection(me->localPos());
-
-		// TODO
-	}
+		orbitPointWorld = getPlaneIntersection(me->localPos());
 	else if (mouseMode == MouseMode::MEASURE)
-	{
 		measureStartPoint = measureEndPoint = getPlaneIntersection(me->localPos());
-	}
 
 	me->accept();
 }
@@ -109,6 +103,8 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 	previousMousePosition = me->globalPos();
 
 	float moveSpeed = mouseSpeedModifier * 0.05f;
+	float yawAmount = -mouseDelta.x() * mouseSpeedModifier;
+	float pitchAmount = -mouseDelta.y() * mouseSpeedModifier;
 
 	if (keyboardHelper.keyIsDown(Qt::Key_Shift))
 		moveSpeed *= 2.0f;
@@ -118,11 +114,6 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 
 	if (mouseMode == MouseMode::ROTATE)
 	{
-		// TODO: FIX
-
-		float yawAmount = -mouseDelta.x() * mouseSpeedModifier;
-		float pitchAmount = -mouseDelta.y() * mouseSpeedModifier;
-
 		if (keyboardHelper.keyIsDown(Qt::Key_Space))
 		{
 			//QVector3D rollAxis = cameraOrientationMatrix.column(2).toVector3D();
@@ -148,6 +139,20 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 	}
 	else if (mouseMode == MouseMode::ORBIT)
 	{
+		orbitPointCamera = viewMatrix * orbitPointWorld;
+
+		QVector3D yawAxis = QVector3D(0, 1, 0);
+		QMatrix4x4 yawMatrix = MathHelper::rotationMatrix(yawAmount, yawAxis);
+		cameraOrientationMatrix = cameraOrientationMatrix * yawMatrix;
+
+		QVector3D pitchAxis = QVector3D(1, 0, 0);
+		QMatrix4x4 pitchMatrix = MathHelper::rotationMatrix(pitchAmount, pitchAxis);
+		cameraOrientationMatrix = cameraOrientationMatrix * pitchMatrix;
+
+		MathHelper::orthonormalize(cameraOrientationMatrix);
+		cameraOrientationInvMatrix = cameraOrientationMatrix.inverted();
+
+		cameraPosition = orbitPointWorld - cameraOrientationMatrix * orbitPointCamera;
 	}
 	else if (mouseMode == MouseMode::PAN)
 		cameraPosition += cameraRight * -mouseDelta.x() * moveSpeed + cameraUp * mouseDelta.y() * moveSpeed;
