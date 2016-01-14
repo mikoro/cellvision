@@ -18,6 +18,16 @@ RenderWidget::RenderWidget(QWidget* parent) : QOpenGLWidget(parent), volumeTextu
 	setFocus();
 }
 
+RenderWidget::~RenderWidget()
+{
+	QSettings settings("cellvision.ini", QSettings::IniFormat);
+
+	settings.setValue("moveSpeedModifier", double(moveSpeedModifier));
+	settings.setValue("mouseMoveSpeedModifier", double(mouseMoveSpeedModifier));
+	settings.setValue("mouseRotateSpeedModifier", double(mouseRotateSpeedModifier));
+	settings.setValue("mouseWheelStepSizeModifier", double(mouseWheelStepSizeModifier));
+}
+
 void RenderWidget::initialize(const RenderWidgetSettings& settings_)
 {
 	settings = settings_;
@@ -56,7 +66,7 @@ void RenderWidget::initialize(const RenderWidgetSettings& settings_)
 	background.vbo.release();
 
 	resetCameraPosition();
-	resetCameraSpeeds();
+	loadCameraSpeeds();
 }
 
 bool RenderWidget::event(QEvent* e)
@@ -372,7 +382,7 @@ void RenderWidget::initializeGL()
 
 	timeStepTimer.start();
 	resetCameraPosition();
-	resetCameraSpeeds();
+	loadCameraSpeeds();
 	updateCamera();
 }
 
@@ -670,6 +680,16 @@ void RenderWidget::resetCameraSpeeds()
 	mouseMoveSpeedModifier = 0.001f;
 	mouseRotateSpeedModifier = 0.2f;
 	mouseWheelStepSizeModifier = 0.05f;
+}
+
+void RenderWidget::loadCameraSpeeds()
+{
+	QSettings settings("cellvision.ini", QSettings::IniFormat);
+
+	moveSpeedModifier = settings.value("moveSpeedModifier", 0.8f).toFloat();
+	mouseMoveSpeedModifier = settings.value("mouseMoveSpeedModifier", 0.001f).toFloat();
+	mouseRotateSpeedModifier = settings.value("mouseRotateSpeedModifier", 0.2f).toFloat();
+	mouseWheelStepSizeModifier = settings.value("mouseWheelStepSizeModifier", 0.05f).toFloat();
 }
 
 void RenderWidget::setMouseMode()

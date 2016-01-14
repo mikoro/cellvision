@@ -46,7 +46,8 @@ namespace CellVision
 	public:
 
 		explicit RenderWidget(QWidget* parent = nullptr);
-		
+		~RenderWidget();
+
 		void initialize(const RenderWidgetSettings& settings);
 		
 	protected:
@@ -68,6 +69,7 @@ namespace CellVision
 		void updateCamera();
 		void resetCameraPosition();
 		void resetCameraSpeeds();
+		void loadCameraSpeeds();
 		void setMouseMode();
 		QVector3D getPlaneIntersection(const QPointF& mousePosition);
 		void generateCubeVertices(std::array<QVector3D, 72>& cubeVertexData, std::array<QVector3D, 24>& cubeLinesVertexData, float width, float height, float depth);
