@@ -123,13 +123,26 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 		float yawAmount = -mouseDelta.x() * mouseSpeedModifier;
 		float pitchAmount = -mouseDelta.y() * mouseSpeedModifier;
 
-		QVector3D yawAxis = cameraOrientationMatrix.column(1).toVector3D();
-		QVector3D pitchAxis = cameraOrientationMatrix.column(0).toVector3D();
+		if (keyboardHelper.keyIsDown(Qt::Key_Space))
+		{
+			//QVector3D rollAxis = cameraOrientationMatrix.column(2).toVector3D();
+			QVector3D rollAxis = QVector3D(0, 0, 1);
+			QMatrix4x4 rollMatrix = MathHelper::rotationMatrix(yawAmount, rollAxis);
+			cameraOrientationMatrix = cameraOrientationMatrix * rollMatrix;
+		}
+		else
+		{
+			//QVector3D yawAxis = cameraOrientationMatrix.column(1).toVector3D();
+			QVector3D yawAxis = QVector3D(0, 1, 0);
+			QMatrix4x4 yawMatrix = MathHelper::rotationMatrix(yawAmount, yawAxis);
+			cameraOrientationMatrix = cameraOrientationMatrix * yawMatrix;
 
-		QMatrix4x4 yawMatrix = MathHelper::rotationMatrix(yawAmount, yawAxis);
-		QMatrix4x4 pitchMatrix = MathHelper::rotationMatrix(pitchAmount, pitchAxis);
+			//QVector3D pitchAxis = cameraOrientationMatrix.column(0).toVector3D();
+			QVector3D pitchAxis = QVector3D(1, 0, 0);
+			QMatrix4x4 pitchMatrix = MathHelper::rotationMatrix(pitchAmount, pitchAxis);
+			cameraOrientationMatrix = cameraOrientationMatrix * pitchMatrix;
+		}
 		
-		cameraOrientationMatrix *= pitchMatrix * yawMatrix;
 		MathHelper::orthonormalize(cameraOrientationMatrix);
 		cameraOrientationInvMatrix = cameraOrientationMatrix.inverted();
 	}
