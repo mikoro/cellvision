@@ -571,13 +571,13 @@ void RenderWidget::paintGL()
 
 		painter.setPen(QColor(0, 0, 0, 96));
 		painter.setBrush(QColor(0, 0, 0, 64));
-		painter.drawRoundRect(-20, -310, 350, 350, 10, 10);
+		painter.drawRoundRect(-20, -360, 400, 400, 10, 10);
 
-		painter.setPen(QColor(255, 255, 255, 255));
-		painter.setFont(QFont("mono", 10, QFont::Normal));
+		painter.setPen(QColor(255, 255, 255, 200));
+		painter.setFont(QFont("Roboto Mono", 10, QFont::Normal));
 		
-		painter.drawText(5, 15, QString("Camera position: (%1, %2, %3)").arg(locale.toString(realCameraPosition.x(), 'e', 3), locale.toString(realCameraPosition.y(), 'e', 3), locale.toString(realCameraPosition.z(), 'e', 3)));
-		painter.drawText(5, 32, QString("Measured distance: %1").arg(locale.toString(realMeasuredDistance, 'e', 3)));
+		painter.drawText(5, 15, QString("Position: (%1, %2, %3)").arg(locale.toString(realCameraPosition.x(), 'e', 3), locale.toString(realCameraPosition.y(), 'e', 3), locale.toString(realCameraPosition.z(), 'e', 3)));
+		painter.drawText(5, 32, QString("Distance: %1").arg(locale.toString(realMeasuredDistance, 'e', 3)));
 
 		textTexture.bind();
 		textTexture.setData(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, textImage.bits());

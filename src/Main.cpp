@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
 	QApplication app(argc, argv);
 	
 	QDir::setCurrent(QCoreApplication::applicationDirPath());
+	QFontDatabase::addApplicationFont("data/fonts/RobotoMono-Regular.ttf");
 
 	MainWindow mainWindow;
 	Log& log = mainWindow.getLog();
