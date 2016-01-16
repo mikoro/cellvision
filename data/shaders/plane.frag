@@ -7,7 +7,7 @@ in vec3 worldPositionVarying;
 
 out vec4 color;
 
-uniform sampler3D texture0;
+uniform sampler3D tex0;
 uniform float scaleY;
 uniform float scaleZ;
 
@@ -27,6 +27,6 @@ void main()
 		discard;
 	}
 	
-	color = texture(texture0, texcoord);
+	color = texture(tex0, texcoord);
 	color.a = 1.0f;
 }

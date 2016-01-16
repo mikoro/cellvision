@@ -109,6 +109,8 @@ namespace CellVision
 		bool renderText = true;
 
 		QOpenGLTexture volumeTexture;
+		QOpenGLTexture textTexture;
+		QImage textImage;
 
 		OpenGLData cube;
 		OpenGLData plane;
@@ -116,5 +118,6 @@ namespace CellVision
 		OpenGLData miniCoordinates;
 		OpenGLData background;
 		OpenGLData measurement;
+		OpenGLData text;
 	};
 }

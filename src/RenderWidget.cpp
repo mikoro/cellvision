@@ -11,7 +11,7 @@
 
 using namespace CellVision;
 
-RenderWidget::RenderWidget(QWidget* parent) : QOpenGLWidget(parent), volumeTexture(QOpenGLTexture::Target3D)
+RenderWidget::RenderWidget(QWidget* parent) : QOpenGLWidget(parent), volumeTexture(QOpenGLTexture::Target3D), textTexture(QOpenGLTexture::Target2D)
 {
 	connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
 
@@ -45,7 +45,6 @@ void RenderWidget::initialize(const RenderWidgetSettings& settings_)
 		volumeTexture.setBorderColor(0.0f, 0.0f, 0.0f, 1.0f);
 		volumeTexture.setMipLevels(1);
 		volumeTexture.setSize(result.width, result.height, result.depth);
-		//volumeTexture.allocateStorage(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8);
 		volumeTexture.allocateStorage();
 		volumeTexture.setData(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, &result.data[0]);
 		volumeTexture.release();
@@ -379,6 +378,41 @@ void RenderWidget::initializeGL()
 	measurement.vbo.release();
 	measurement.program.release();
 
+	// TEXT //
+
+	const float textVertexData[] =
+	{
+		-1.0f, -1.0f, 0.0f, 0.0f,
+		1.0f, -1.0f, 1.0f, 0.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+
+		-1.0f, -1.0f, 0.0f, 0.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f, 0.0f, 1.0f
+	};
+
+	text.program.addShaderFromSourceFile(QOpenGLShader::Vertex, "data/shaders/text.vert");
+	text.program.addShaderFromSourceFile(QOpenGLShader::Fragment, "data/shaders/text.frag");
+	text.program.link();
+	text.program.bind();
+
+	text.vbo.create();
+	text.vbo.bind();
+	text.vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
+	text.vbo.allocate(textVertexData, sizeof(textVertexData));
+
+	text.vao.create();
+	text.vao.bind();
+
+	text.program.enableAttributeArray("position");
+	text.program.enableAttributeArray("texcoord");
+	text.program.setAttributeBuffer("position", GL_FLOAT, 0, 2, 4 * sizeof(GLfloat));
+	text.program.setAttributeBuffer("texcoord", GL_FLOAT, 2 * sizeof(GLfloat), 2, 4 * sizeof(GLfloat));
+
+	text.vao.release();
+	text.vbo.release();
+	text.program.release();
+
 	// MISC //
 
 	timeStepTimer.start();
@@ -392,6 +426,15 @@ void RenderWidget::resizeGL(int width, int height)
 	float aspectRatio = float(width) / float(height);
 	projectionMatrix.setToIdentity();
 	projectionMatrix.perspective(45.0f, aspectRatio, 0.001f, 100.0f);
+
+	textImage = QImage(width, height, QImage::Format_RGBA8888);
+	textImage.fill(QColor(0, 0, 0, 0));
+
+	textTexture.destroy();
+	textTexture.create();
+	textTexture.bind();
+	textTexture.setData(textImage);
+	textTexture.release();
 }
 
 void RenderWidget::paintGL()
@@ -456,7 +499,7 @@ void RenderWidget::paintGL()
 	if (volumeTexture.isCreated())
 		volumeTexture.bind();
 
-	plane.program.setUniformValue("texture0", 0);
+	plane.program.setUniformValue("tex0", 0);
 	plane.program.setUniformValue("modelMatrix", plane.modelMatrix);
 	plane.program.setUniformValue("mvp", plane.mvp);
 	plane.program.setUniformValue("scaleY", settings.imageHeight / settings.imageWidth);
@@ -505,7 +548,7 @@ void RenderWidget::paintGL()
 		measurement.program.release();
 	}
 
-	// TEXTS //
+	// TEXT //
 
 	if (renderText)
 	{
@@ -516,11 +559,13 @@ void RenderWidget::paintGL()
 		float realPlaneDistance = planeDistance * settings.imageWidth;
 		float realMeasurementDistance = measureDistance * settings.imageWidth;
 
+		textImage.fill(QColor(0, 0, 0, 0));
+
 		QFont font("mono", 10, QFont::Normal);
 		font.setHintingPreference(QFont::PreferFullHinting);
 		font.setStyleStrategy(QFont::PreferAntialias);
 
-		QPainter painter(this);
+		QPainter painter(&textImage);
 		painter.setRenderHint(QPainter::Antialiasing);
 		painter.setRenderHint(QPainter::TextAntialiasing);
 		painter.setRenderHint(QPainter::SmoothPixmapTransform);
@@ -531,6 +576,21 @@ void RenderWidget::paintGL()
 		painter.drawText(5, 32, QString("Plane position: (%1, %2, %3)").arg(locale.toString(realPlanePosition.x(), 'e', 3), locale.toString(realPlanePosition.y(), 'e', 3), locale.toString(realPlanePosition.z(), 'e', 3)));
 		painter.drawText(5, 49, QString("Plane distance: %1").arg(locale.toString(realPlaneDistance, 'e', 3)));
 		painter.drawText(5, 66, QString("Measurement distance: %1").arg(locale.toString(realMeasurementDistance, 'e', 3)));
+
+		textTexture.bind();
+		textTexture.setData(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, textImage.bits());
+
+		text.program.bind();
+		text.vao.bind();
+
+		text.program.setUniformValue("tex0", 0);
+
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		text.vao.release();
+		text.program.release();
+
+		textTexture.release();
 	}
 }
 
