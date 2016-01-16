@@ -183,6 +183,7 @@ void MainWindow::on_pushButtonLoadFullscreen_clicked()
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->addWidget(renderWidget);
 	dialog->setLayout(layout);
+    dialog->resize(100, 100);
 	dialog->showFullScreen();
 
 	connect(dialog, SIGNAL(rejected()), this, SLOT(fullscreenDialogClosed()));
