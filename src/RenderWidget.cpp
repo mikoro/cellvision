@@ -555,13 +555,11 @@ void RenderWidget::paintGL()
 		QLocale locale(QLocale::English);
 
 		QVector3D realCameraPosition = cameraPosition * settings.imageWidth;
-		QVector3D realPlanePosition = planePosition * settings.imageWidth;
-		float realPlaneDistance = planeDistance * settings.imageWidth;
-		float realMeasurementDistance = measureDistance * settings.imageWidth;
+		float realMeasuredDistance = measureDistance * settings.imageWidth;
 
 		textImage.fill(QColor(0, 0, 0, 0));
 
-		QFont font("mono", 10, QFont::Normal);
+		QFont font("mono", 12, QFont::Normal);
 		font.setHintingPreference(QFont::PreferFullHinting);
 		font.setStyleStrategy(QFont::PreferAntialias);
 
@@ -570,12 +568,16 @@ void RenderWidget::paintGL()
 		painter.setRenderHint(QPainter::TextAntialiasing);
 		painter.setRenderHint(QPainter::SmoothPixmapTransform);
 		painter.setRenderHint(QPainter::HighQualityAntialiasing);
-		painter.setPen(Qt::white);
+
+		painter.setPen(QColor(0, 0, 0, 96));
+		painter.setBrush(QColor(0, 0, 0, 64));
+		painter.drawRoundRect(-20, -310, 350, 350, 10, 10);
+
+		painter.setPen(QColor(255, 255, 255, 255));
 		painter.setFont(QFont("mono", 10, QFont::Normal));
+		
 		painter.drawText(5, 15, QString("Camera position: (%1, %2, %3)").arg(locale.toString(realCameraPosition.x(), 'e', 3), locale.toString(realCameraPosition.y(), 'e', 3), locale.toString(realCameraPosition.z(), 'e', 3)));
-		painter.drawText(5, 32, QString("Plane position: (%1, %2, %3)").arg(locale.toString(realPlanePosition.x(), 'e', 3), locale.toString(realPlanePosition.y(), 'e', 3), locale.toString(realPlanePosition.z(), 'e', 3)));
-		painter.drawText(5, 49, QString("Plane distance: %1").arg(locale.toString(realPlaneDistance, 'e', 3)));
-		painter.drawText(5, 66, QString("Measurement distance: %1").arg(locale.toString(realMeasurementDistance, 'e', 3)));
+		painter.drawText(5, 32, QString("Measured distance: %1").arg(locale.toString(realMeasuredDistance, 'e', 3)));
 
 		textTexture.bind();
 		textTexture.setData(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, textImage.bits());
@@ -703,14 +705,17 @@ void RenderWidget::updateLogic()
 
 	// MEASUREMENT //
 
-	measurement.modelMatrix.setToIdentity();
-	measurement.mvp = projectionMatrix * viewMatrix * measurement.modelMatrix;
+	if (mouseMode == MouseMode::MEASURE)
+	{
+		measurement.modelMatrix.setToIdentity();
+		measurement.mvp = projectionMatrix * viewMatrix * measurement.modelMatrix;
 
-	const QVector3D measurementVertexData[] = { measureStartPoint, measureEndPoint };
+		const QVector3D measurementVertexData[] = { measureStartPoint, measureEndPoint };
 
-	measurement.vbo.bind();
-	measurement.vbo.write(0, measurementVertexData, sizeof(measurementVertexData));
-	measurement.vbo.release();
+		measurement.vbo.bind();
+		measurement.vbo.write(0, measurementVertexData, sizeof(measurementVertexData));
+		measurement.vbo.release();
+	}
 }
 
 void RenderWidget::updateCamera()
