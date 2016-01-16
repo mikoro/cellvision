@@ -53,10 +53,10 @@ int main(int argc, char *argv[])
 	format.setSwapInterval(1);
 	format.setSamples(4);
 	format.setVersion(3, 3);
-#ifndef __APPLE__
-	format.setProfile(QSurfaceFormat::CompatibilityProfile);
-#else
+#ifdef __APPLE__
 	format.setProfile(QSurfaceFormat::CoreProfile);
+#else
+	format.setProfile(QSurfaceFormat::CompatibilityProfile);
 #endif
 	QSurfaceFormat::setDefaultFormat(format);
 

@@ -559,10 +559,6 @@ void RenderWidget::paintGL()
 
 		textImage.fill(QColor(0, 0, 0, 0));
 
-		QFont font("mono", 12, QFont::Normal);
-		font.setHintingPreference(QFont::PreferFullHinting);
-		font.setStyleStrategy(QFont::PreferAntialias);
-
 		QPainter painter(&textImage);
 		painter.setRenderHint(QPainter::Antialiasing);
 		painter.setRenderHint(QPainter::TextAntialiasing);
@@ -573,8 +569,19 @@ void RenderWidget::paintGL()
 		painter.setBrush(QColor(0, 0, 0, 64));
 		painter.drawRoundRect(-20, -360, 400, 400, 10, 10);
 
-		painter.setPen(QColor(255, 255, 255, 200));
-		painter.setFont(QFont("Roboto Mono", 10, QFont::Normal));
+#ifdef __APPLE__
+		int textSize = 12;
+#else
+		int textSize = 10;
+#endif
+
+		QFont font("Roboto Mono", textSize, QFont::Normal);
+		font.setHintingPreference(QFont::PreferFullHinting);
+		font.setStyleStrategy(QFont::PreferAntialias);
+
+		painter.setBrush(Qt::NoBrush);
+		painter.setPen(QColor(255, 255, 255, 255));
+		painter.setFont(font);
 		
 		painter.drawText(5, 15, QString("Position: (%1, %2, %3)").arg(locale.toString(realCameraPosition.x(), 'e', 3), locale.toString(realCameraPosition.y(), 'e', 3), locale.toString(realCameraPosition.z(), 'e', 3)));
 		painter.drawText(5, 32, QString("Distance: %1").arg(locale.toString(realMeasuredDistance, 'e', 3)));
