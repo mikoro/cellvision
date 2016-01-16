@@ -45,7 +45,8 @@ void RenderWidget::initialize(const RenderWidgetSettings& settings_)
 		volumeTexture.setBorderColor(0.0f, 0.0f, 0.0f, 1.0f);
 		volumeTexture.setMipLevels(1);
 		volumeTexture.setSize(result.width, result.height, result.depth);
-		volumeTexture.allocateStorage(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8);
+		//volumeTexture.allocateStorage(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8);
+		volumeTexture.allocateStorage();
 		volumeTexture.setData(QOpenGLTexture::RGBA, QOpenGLTexture::UInt8, &result.data[0]);
 		volumeTexture.release();
 	}

@@ -19,7 +19,7 @@ void SysUtils::openFileExternally(const std::string& filePath)
 #ifdef __linux
 		char* arg[] = { (char*)"xdg-open", (char*)filePath.c_str(), (char*)nullptr };
 #elif __APPLE__
-        char* arg[] = { (char*)"open", (char*)filePath.c_str(), (char*)nullptr };
+		char* arg[] = { (char*)"open", (char*)filePath.c_str(), (char*)nullptr };
 #endif
 	}
 #endif

@@ -8,6 +8,10 @@
 #include <cstdint>
 #include <algorithm>
 
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+
 #include <QtCore>
 #include <QtWidgets>
 #include <QtWidgets/QApplication>

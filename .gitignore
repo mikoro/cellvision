@@ -15,6 +15,7 @@
 *.zip
 *.tif
 *.txt
+*~
 .vs
 My*
 *sublime*
