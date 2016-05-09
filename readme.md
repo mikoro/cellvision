@@ -5,6 +5,8 @@ A 3D volume image visualizer.
 * Author: [Mikko Ronkainen](http://mikkoronkainen.com)
 * Website: [github.com/mikoro/cellvision](https://github.com/mikoro/cellvision)
 
+![Screenshot](http://mikoro.github.io/images/cellvision/readme-screenshot.jpg "Screenshot")
+
 ## Download
 
 | Windows 64-bit                                                                                                     | Mac OS X (10.9+)                                                                                                   | Linux 64-bit (Ubuntu 15.10)                                                                                      |
