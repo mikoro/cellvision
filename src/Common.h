@@ -3,4 +3,4 @@
 
 #pragma once
 
-#define CELLVISION_VERSION "0.2.1"
+#define CELLVISION_VERSION "0.3.0"

@@ -9,7 +9,7 @@ A 3D volume image visualizer.
 
 | Windows 64-bit                                                                                                     | Mac OS X (10.9+)                                                                                                   | Linux 64-bit (Ubuntu 15.10)                                                                                      |
 |--------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
-| [cellvision-win-0.2.1.zip](https://github.com/mikoro/cellvision/releases/download/v0.2.1/cellvision-win-0.2.1.zip) | [cellvision-mac-0.2.1.zip](https://github.com/mikoro/cellvision/releases/download/v0.2.1/cellvision-mac-0.2.1.zip) | N/A |
+| [cellvision-win-0.3.0.zip](https://github.com/mikoro/cellvision/releases/download/v0.3.0/cellvision-win-0.3.0.zip) | [cellvision-mac-0.3.0.zip](https://github.com/mikoro/cellvision/releases/download/v0.3.0/cellvision-mac-0.3.0.zip) | N/A |
 
 ## Features
 
