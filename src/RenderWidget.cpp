@@ -163,7 +163,7 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* me)
 		cameraPosition = orbitPointWorld - cameraOrientationMatrix * orbitPointCamera;
 	}
 	else if (mouseMode == MouseMode::PAN)
-		cameraPosition += cameraRight * -mouseDelta.x() * moveSpeed + cameraUp * mouseDelta.y() * moveSpeed;
+		cameraPosition += (cameraRight * -mouseDelta.x() * moveSpeed + cameraUp * mouseDelta.y() * moveSpeed) * planeDistance;
 	else if (mouseMode == MouseMode::ZOOM)
 		cameraPosition += cameraForward * -mouseDelta.y() * moveSpeed;
 	else if (mouseMode == MouseMode::MEASURE)
